@@ -450,7 +450,7 @@ class Task:
 
             # 请慢一点
             case 100001:
-                logger.warning("【创建订单】100001! 服务器卡卡卡咔咔咔咔卡卡卡(无需在意)")
+                logger.warning("【创建订单】100001! 服务器卡卡卡咔咔咔咔卡卡卡")
                 # 刷新
                 self.AutoSleepInterval()
 
@@ -478,10 +478,6 @@ class Task:
                 logger.warning("程序正在准备退出...")
                 sleep(5)
                 sys.exit()
-
-            # 本项目需要联系人信息
-            case 209001:
-                logger.error("【创建订单】本项目需要联系人信息! 请补充联系人信息")
 
             # 项目/票种不可售 等待开票
             case 100016 | 100017:

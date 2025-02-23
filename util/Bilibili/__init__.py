@@ -64,7 +64,7 @@ class Bilibili:
 
         self.deliver = deliver
         self.deliverNeed = False
-        self.ContactNeed = False
+        self.contactNeed = False
         self.deliverFee = 0
         self.payment = 0
 
@@ -80,6 +80,7 @@ class Bilibili:
         # 成功
         if code == 0:
             self.deliverNeed = res["data"]["has_paper_ticket"]
+            self.contactNeed = not res["data"]["need_contact"]
             for _i, screen in enumerate(res["data"]["screen_list"]):
                 if screen["id"] == self.screenId:
                     for _j, sku in enumerate(screen["ticket_list"]):
@@ -346,7 +347,7 @@ class Bilibili:
             params["tel"] = self.phone
 
         # 联系人信息
-        if self.ContactNeed:
+        if self.contactNeed:
             params["buyer"] = self.userinfo["username"]
             params["tel"] = self.phone
 
@@ -371,13 +372,13 @@ class Bilibili:
 
             # 未预填收货联系人信息
             case 209001:
-                self.ContactNeed = True
                 tmp = self.net.Response(
                     method="post",
                     url="https://show.bilibili.com/api/ticket/buyer/saveContactInfo",
                     params={"username": self.userinfo["username"], "tel": self.phone},
                 )
                 if tmp["errno"] == 0:
+                    self.contactNeed = True
                     logger.info("【创建订单】已自动设置收货联系人信息")
 
         return code, msg
