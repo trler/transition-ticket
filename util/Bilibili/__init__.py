@@ -82,19 +82,18 @@ class Bilibili:
         res = self.net.Response(method="get", url=url)
         code = res["errno"]
 
-        # 成功
-        if code == 0:
-            self.deliverNeed = res["data"]["has_paper_ticket"]
-            self.contactNeed = not res["data"]["need_contact"]
-            for _i, screen in enumerate(res["data"]["screen_list"]):
-                if screen["id"] == self.screenId:
-                    for _j, sku in enumerate(screen["ticket_list"]):
-                        if sku["id"] == self.skuId:
-                            dist = sku["saleStart"]
-                            break
-            return code, dist
-        else:
-            return 114514, 0
+        match code:
+            # 成功
+            case 0:
+                for _i, screen in enumerate(res["data"]["screen_list"]):
+                    if screen["id"] == self.screenId:
+                        for _j, sku in enumerate(screen["ticket_list"]):
+                            if sku["id"] == self.skuId:
+                                dist = sku["saleStart"]
+                                break
+                return code, dist
+            case _:
+                return 114514, 0
 
     @logger.catch
     def QueryToken(self) -> tuple:
@@ -123,7 +122,6 @@ class Bilibili:
         code = res["errno"]
         msg = res["msg"]
 
-        # 处理
         match code:
             # 成功
             case 0:
@@ -162,7 +160,6 @@ class Bilibili:
         code = res["code"]
         msg = res["message"]
 
-        # 处理
         match code:
             # 成功
             case 0:
@@ -180,8 +177,6 @@ class Bilibili:
 
                     case _:
                         dist = ""
-
-            # 不知道
             case _:
                 type = ""
                 dist = ""
@@ -198,7 +193,6 @@ class Bilibili:
         """
         url = "https://api.bilibili.com/x/gaia-vgate/v1/validate"
 
-        # 处理
         match validateMode:
             case "geetest":
                 params = {
@@ -275,12 +269,13 @@ class Bilibili:
         return code, msg, clickable, salenum, num
 
     @logger.catch
-    def QueryPrice(self) -> None:
+    def QueryParamInfo(self) -> None:
         """
-        获取价格
+        获取基本信息
 
-        self.cost: 票价
         self.deliverFee: 邮费
+        self.deliverNeed: 是否需要邮寄
+        self.contactNeed: 是否需要联系人
         """
         url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.projectId}&project_id={self.projectId}&requestSource={self.scene}"
         res = self.net.Response(method="get", url=url)
@@ -291,7 +286,9 @@ class Bilibili:
             case 0:
                 data = res["data"]
                 screen = data["screen_list"][self.screenPath]
-                sku = data["screen_list"][self.screenPath]["ticket_list"][self.skuPath]
+                
+                self.deliverNeed = res["data"]["has_paper_ticket"]
+                self.contactNeed = not res["data"]["need_contact"]
 
                 # 有保存Screen位置
                 if screen["id"] == self.skuId:
@@ -304,8 +301,9 @@ class Bilibili:
                             self.deliverFee = max(screen["express_fee"], 0)
                             break
             case _:
-                self.cost = 0
                 self.deliverFee = 0
+                self.deliverNeed = False
+                self.contactNeed = True
 
     @logger.catch
     def CreateOrder(self) -> tuple:

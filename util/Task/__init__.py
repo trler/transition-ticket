@@ -286,7 +286,7 @@ class Task:
 
                 # 预处理
                 if countdown == 30:
-                    self.api.QueryPrice()
+                    self.api.QueryParamInfo()
                     self.queryCache = True
                     logger.info("【等待开票】已缓存商品信息")
 
@@ -334,7 +334,7 @@ class Task:
 
         # 顺路
         if not self.queryCache and self.countdownOver:
-            self.api.QueryPrice()
+            self.api.QueryParamInfo()
             self.queryCache = True
             logger.info("【获取Token】已缓存商品信息")
 

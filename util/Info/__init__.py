@@ -112,8 +112,8 @@ class Info:
                 "display_name": sku["sale_flag"]["display_name"],
                 "price": sku["price"],
                 "display_price": f"{(sku['price'] / 100):.2f}",
-                "sale_start": sku["sale_start"],
-                "sale_end": sku["sale_end"],
+                "sale_start": sku["saleStart"],
+                "sale_end": sku["saleEnd"],
                 "act": {
                     "act_id": sku["discount_act"]["act_id"],
                     "act_type": sku["discount_act"]["act_type"],
