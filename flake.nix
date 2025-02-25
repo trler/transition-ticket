@@ -35,8 +35,6 @@
                 pip
                 venvShellHook
               ]);
-            PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple";
-            PIP_TRUSTED_HOST = "pypi.tuna.tsinghua.edu.cn";
             LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath packages;
           };
       }
