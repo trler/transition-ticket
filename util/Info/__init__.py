@@ -27,7 +27,7 @@ class Info:
         net: 网络实例
         """
         self.net = net
-        
+
         self.scene = "neul-next"
 
     def Project(self, projectId: int) -> dict:
