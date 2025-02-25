@@ -92,13 +92,13 @@ class ProductCli:
                 return ProjectStep()
 
         @logger.catch
-        def ScreenStep() -> int:
+        def ScreenStep(projectId: int) -> int:
             """
             场次
             """
             try:
-                projectInfo = self.info.Project()
-                screenInfo = self.info.ScreenList()
+                projectInfo = self.info.Project(projectId=projectId)
+                screenInfo = self.info.ScreenList(projectId=projectId)
 
                 lists = {
                     f"{self.YELLOW if screenInfo[i]['display_name'] == '预售中' else ''}"
@@ -120,18 +120,17 @@ class ProductCli:
                 sys.exit()
 
         @logger.catch
-        def SkuStep(screenId: int) -> tuple:
+        def SkuStep(projectId: int, screenId: int) -> tuple:
             """
             价位
 
             screenId: 场次ID
             """
             try:
-                skuInfo = self.info.SkuList(screenId)
+                skuInfo = self.info.SkuList(projectId=projectId, screenId=screenId)
+
                 lists = {
-                    f"{self.YELLOW if skuInfo[i]['display_name'] == '预售中' else ''}{skuInfo[i]['name']} {skuInfo[i]['display_price']}元 ({skuInfo[i]['display_name']}){self.RESET}": skuInfo[
-                        i
-                    ]
+                    f"{self.YELLOW if skuInfo[i]['display_name'] == '预售中' else ''}{skuInfo[i]['name']} {skuInfo[i]['display_price']}元 ({skuInfo[i]['display_name']}){self.RESET}": skuInfo[i]
                     for i in range(len(skuInfo))
                 }
                 select = self.data.Inquire(
@@ -139,7 +138,7 @@ class ProductCli:
                     message="请选择价位",
                     choices=list(lists.keys()),
                 )
-                return lists[select]["id"], lists[select]["name"] + lists[select]["display_price"], lists[select]["price"], lists[select]["act"]
+                return lists[select]["id"], lists[select]["name"] + " " + lists[select]["display_price"], lists[select]["price"], lists[select]["act"]
 
             except InfoException:
                 logger.exception("请重新配置活动信息!")
@@ -164,17 +163,17 @@ class ProductCli:
         print("下面开始配置商品!")
 
         self.config["projectId"] = ProjectStep()
-        self.info = Info(net=self.net, pid=self.config["projectId"])
 
-        self.config["screenId"] = ScreenStep()
+        self.config["screenId"] = ScreenStep(projectId=self.config["projectId"])
 
-        skuId, skuSelected, cost, act = SkuStep(screenId=self.config["screenId"])
+        skuId, skuSelected, cost, act = SkuStep(projectId=self.config["projectId"], screenId=self.config["screenId"])
         self.config["skuId"] = skuId
         self.config["cost"] = cost
         self.config["act"] = act
 
+        name = self.info.Project(projectId=self.config["projectId"])["name"]
         self.conf.Save(
-            FilenameStep(name=f"{self.info.Project()['name']} ({skuSelected})"),
+            FilenameStep(name=f"{name} ({skuSelected})"),
             self.config,
         )
         logger.info("【商品配置初始化】配置已保存!")

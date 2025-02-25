@@ -40,8 +40,8 @@ class Data:
     数据处理
     """
 
-    @logger.catch
-    def JsonpToDict(self, data: str) -> dict:
+    @staticmethod
+    def JsonpToDict(data: str) -> dict:
         """
         JSONP转JSON
 
@@ -52,8 +52,8 @@ class Data:
         json_str = data[startIndex:endIndex]
         return json.loads(json_str)
 
-    @logger.catch
-    def QRGenerate(self, url: str) -> None:
+    @staticmethod
+    def QRGenerate(url: str) -> None:
         """
         生成二维码
 
@@ -81,8 +81,8 @@ class Data:
         else:
             qr.print_ascii(invert=True)
 
-    @logger.catch
-    def SeleniumCookieFormat(self, cookie: list) -> dict:
+    @staticmethod
+    def SeleniumCookieFormat(cookie: list) -> dict:
         """
         将Selenium输出的Cookie转为标准Cookie
 
@@ -93,8 +93,8 @@ class Data:
             dist[i["name"]] = i["value"]
         return dist
 
-    @logger.catch
-    def StrCookieFormat(self, cookie: str) -> dict:
+    @staticmethod
+    def StrCookieFormat(cookie: str) -> dict:
         """
         将字符串Cookie转为标准Cookie
 
@@ -108,13 +108,8 @@ class Data:
                 dist[key] = value
         return dist
 
-    @logger.catch
-    def TimestampFormat(
-        self,
-        timestamp: int,
-        format_type: str = "s",
-        countdown: bool = False,
-    ) -> str:
+    @staticmethod
+    def TimestampFormat(timestamp: int, format_type: str = "s", countdown: bool = False) -> str:
         """
         时间戳转换
 
@@ -146,8 +141,8 @@ class Data:
                     logger.exception("【时间戳转换】时间错误")
                     return ""
 
-    @logger.catch
-    def TimestampCheck(self, timestamp: int, duration: float = 15.0) -> bool:
+    @staticmethod
+    def TimestampCheck(timestamp: int, duration: float = 15.0) -> bool:
         """
         时间戳有效性检查
 
@@ -156,8 +151,8 @@ class Data:
         """
         return timestamp + duration * 60 >= datetime.datetime.now().timestamp() >= timestamp
 
-    @logger.catch
-    def PasswordRSAEncrypt(self, password: str, public_key: str) -> str:
+    @staticmethod
+    def PasswordRSAEncrypt(password: str, public_key: str) -> str:
         """
         RSA加密密码
 
@@ -173,8 +168,8 @@ class Data:
 
         return base64.b64encode(cipher_text).decode("utf-8")
 
-    @logger.catch
-    def AESEncrypt(self, data: str) -> str:
+    @staticmethod
+    def AESEncrypt(data: str) -> str:
         """
         AES-128 加密
 
@@ -186,8 +181,8 @@ class Data:
         cipher_text = cipher.encrypt(pad(data.encode(), AES.block_size))
         return base64.b64encode(cipher_text).decode("utf-8")
 
-    @logger.catch
-    def AESDecrypt(self, data: str) -> str:
+    @staticmethod
+    def AESDecrypt(data: str) -> str:
         """
         AES-128 解密
 
@@ -206,8 +201,8 @@ class Data:
             sleep(5)
             sys.exit()
 
-    @logger.catch
-    def CookieAppend(self, baseCookie: dict) -> dict:
+    @staticmethod
+    def CookieAppend(baseCookie: dict) -> dict:
         """
         补充非浏览器登录用户Cookie数据
 
@@ -234,9 +229,8 @@ class Data:
         dist["buvid_fp"] = dist["fingerprint"]
         return dist | baseCookie
 
-    @logger.catch
+    @staticmethod
     def Inquire(
-        self,
         type: str = "Text",
         message: str = "",
         choices: list | None = None,

@@ -1,6 +1,6 @@
 from loguru import logger
 
-from util import Data, Request
+from util import Request
 
 
 class InfoException(Exception):
@@ -20,27 +20,23 @@ class Info:
     """
 
     @logger.catch
-    def __init__(self, net: Request, pid: int = 0):
+    def __init__(self, net: Request):
         """
         初始化
 
         net: 网络实例
-        pid: 场次ID
         """
         self.net = net
-        self.pid = pid
 
-        self.data = Data()
-
-    def Project(self) -> dict:
+    def Project(self, projectId: int) -> dict:
         """
         项目基本信息
 
-        接口: GET https://show.bilibili.com/api/ticket/project/getV2?version=134&id=${pid}
+        projectId: 项目ID
         """
         res = self.net.Response(
             method="get",
-            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.pid}",
+            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}",
         )
 
         base_info_id = 0
@@ -53,60 +49,72 @@ class Info:
             "id": res["data"]["id"],
             "name": res["data"]["name"],
             "time": res["data"]["performance_desc"]["list"][base_info_id]["details"][0]["content"],
-            "start": self.data.TimestampFormat(int(res["data"]["sale_begin"])),
-            "end": self.data.TimestampFormat(int(res["data"]["sale_end"])),
-            "countdown": self.data.TimestampFormat(int(res["data"]["count_down"]), "s", countdown=True),
+            "need_deliver": res["data"]["has_paper_ticket"],
+            "need_contact": res["data"]["need_contact"],
         }
         return dist
 
-    def ScreenList(self) -> dict:  # TODO: 新增 Screen(self, sid: int)
+    def ScreenList(self, projectId: int) -> list[dict]:
         """
-        场次信息
+        场次信息列表
 
-        接口: GET https://show.bilibili.com/api/ticket/project/getV2?version=134&id=${pid}
+        projectId: 项目ID
         """
         res = self.net.Response(
             method="get",
-            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.pid}",
+            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}",
         )
 
         screens = res["data"]["screen_list"]
         if not screens:
             raise InfoException("活动详情", "该活动暂未开放票务信息")
 
-        dist = {}
-        for i, screen in enumerate(screens):
-            dist[i] = {
+        dist = []
+        for screen in screens:
+            dist.append({
                 "id": screen["id"],
                 "name": screen["name"],
                 "display_name": screen["saleFlag"]["display_name"],
-                "sale_start": self.data.TimestampFormat(int(screen["sale_start"])),
-                "sale_end": self.data.TimestampFormat(int(screen["sale_end"])),
-            }
+                "sale_start": screen["sale_start"],
+                "sale_end": screen["sale_end"],
+                "express_fee": screen["express_fee"],
+                # "express_free_flag": screen["express_free_flag"],
+            })
         return dist
 
-    def SkuList(self, sid: int) -> dict:  # TODO: 新增 Sku(self, sid: int, sku: int)
+    def Screen(self, projectId: int, screenId: int) -> dict:
         """
-        价格信息
+        场次信息
 
-        接口: GET https://show.bilibili.com/api/ticket/project/getV2?version=134&id=${pid}
+        projectId: 项目ID
+        screenId: 场次ID
+        """
+        screens = self.ScreenList(projectId=projectId)
 
-        sid: 场次ID
+        for screen in screens:
+            if screen["id"] == screenId:
+                return screen
+        raise InfoException("场次查询", "指定场次不存在")
+
+    def SkuList(self, projectId: int, screenId: int) -> list[dict]:
+        """
+        价格信息列表
+
+        screenId: 场次ID
         """
         res = self.net.Response(
             method="get",
-            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.pid}",
+            url=f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}",
         )
 
-        skus = {}
         for i in res["data"]["screen_list"]:
-            if i["id"] == sid:
+            if i["id"] == screenId:
                 skus = i["ticket_list"]
                 break
 
-        dist = {}
-        for i, sku in enumerate(skus):
-            dist[i] = {
+        dist = []
+        for sku in skus:
+            dist.append({
                 "id": sku["id"],
                 "name": f"{sku['screen_name']} - {sku['desc']}",
                 "display_name": sku["sale_flag"]["display_name"],
@@ -118,16 +126,31 @@ class Info:
                     "act_id": sku["discount_act"]["act_id"],
                     "act_type": sku["discount_act"]["act_type"],
                 }
-                if sku["discount_act"] is not None
-                else {},
-            }
+                if sku["discount_act"] else {},
+            })
         return dist
+
+    def Sku(self, projectId: int, screenId: int, skuId: int, cost: int) -> dict:
+        """
+        价格信息
+
+        projectId: 项目ID
+        screenId: 场次ID
+        skuId: 票档ID
+        cost: 价格
+        """
+        skus = self.SkuList(projectId=projectId, screenId=screenId)
+
+        for sku in skus:
+            if sku["id"] == skuId and sku["price"] == cost:
+                return sku
+        raise InfoException("场次查询", "指定票种不存在")
 
     def Buyer(self) -> list:
         """
         购买人
 
-        接口: GET https://show.bilibili.com/api/ticket/buyer/list?is_default&projectId=${pid}
+        接口: GET https://show.bilibili.com/api/ticket/buyer/list?is_default&projectId=${projectId}
         """
         res = self.net.Response(
             method="get",

@@ -5,6 +5,7 @@ from time import time
 
 from loguru import logger
 
+from util.Info import Info
 from util.Request import Request
 
 
@@ -46,6 +47,7 @@ class Bilibili:
         cost: 订单单价
         """
         self.net = net
+        self.info = Info(net=net)
 
         self.projectId = projectId
         self.screenId = screenId
@@ -74,26 +76,15 @@ class Bilibili:
         self.payment = 0
 
     @logger.catch
-    def GetSaleStartTime(self) -> tuple:  # TODO: 调用self.Info.Sku() 替代请求 getv2
+    def QuerySaleStartTime(self) -> tuple:
         """
         获取开票时间
         """
-        url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.projectId}&project_id={self.projectId}&requestSource={self.scene}"
-        res = self.net.Response(method="get", url=url)
-        code = res["errno"]
-
-        match code:
-            # 成功
-            case 0:
-                for _i, screen in enumerate(res["data"]["screen_list"]):
-                    if screen["id"] == self.screenId:
-                        for _j, sku in enumerate(screen["ticket_list"]):
-                            if sku["id"] == self.skuId:
-                                dist = sku["saleStart"]
-                                break
-                return code, dist
-            case _:
-                return 114514, 0
+        try:
+            skuInfo = self.info.Sku(projectId=self.projectId, screenId=self.screenId, skuId=self.skuId, cost=self.cost)
+            return 0, skuInfo["sale_start"]
+        except Exception:
+            return 114514, 0
 
     @logger.catch
     def QueryToken(self) -> tuple:
@@ -277,33 +268,12 @@ class Bilibili:
         self.deliverNeed: 是否需要邮寄
         self.contactNeed: 是否需要联系人
         """
-        url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={self.projectId}&project_id={self.projectId}&requestSource={self.scene}"
-        res = self.net.Response(method="get", url=url)
-        code = res["errno"]
+        projectInfo = self.info.Project(projectId=self.projectId)
+        screenInfo = self.info.Screen(projectId=self.projectId, screenId=self.screenId)
 
-        match code:
-            # 成功
-            case 0:
-                data = res["data"]
-                screen = data["screen_list"][self.screenPath]
-
-                self.deliverNeed = res["data"]["has_paper_ticket"]
-                self.contactNeed = not res["data"]["need_contact"]
-
-                # 有保存Screen位置
-                if screen["id"] == self.skuId:
-                    self.deliverFee = max(screen["express_fee"], 0)
-
-                # 没保存Screen位置
-                else:
-                    for _i, screen in enumerate(data["screen_list"]):
-                        if screen["id"] == self.screenId:
-                            self.deliverFee = max(screen["express_fee"], 0)
-                            break
-            case _:
-                self.deliverFee = 0
-                self.deliverNeed = False
-                self.contactNeed = True
+        self.deliverNeed = projectInfo["need_deliver"]
+        self.contactNeed = not projectInfo["need_contact"]
+        self.deliverFee = max(screenInfo["express_fee"], 0)
 
     @logger.catch
     def CreateOrder(self) -> tuple:
@@ -398,7 +368,7 @@ class Bilibili:
         return code, res["msg"]
 
     @logger.catch
-    def GetOrderStatus(self) -> tuple:
+    def QueryOrderStatus(self) -> tuple:
         """
         获取订单状态
         """

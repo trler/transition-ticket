@@ -238,7 +238,7 @@ class Task:
         """
         等待开票
         """
-        code, start_time = self.api.GetSaleStartTime()
+        code, start_time = self.api.QuerySaleStartTime()
 
         match code:
             # 成功
@@ -509,7 +509,7 @@ class Task:
             case 0:
                 logger.success(f"【创建订单状态】锁单成功! {msg}")
 
-                self.createStatusCode, msg = self.api.GetOrderStatus()
+                self.createStatusCode, msg = self.api.QueryOrderStatus()
                 match self.createStatusCode:
                     # 成功
                     case 0:
