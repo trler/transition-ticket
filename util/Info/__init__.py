@@ -98,7 +98,7 @@ class Info:
 
     def SkuList(self, projectId: int, screenId: int) -> list[dict]:
         """
-        价格信息列表
+        票种信息列表
 
         screenId: 场次ID
         """
@@ -132,7 +132,7 @@ class Info:
 
     def Sku(self, projectId: int, screenId: int, skuId: int, cost: int) -> dict:
         """
-        价格信息
+        票种信息
 
         projectId: 项目ID
         screenId: 场次ID

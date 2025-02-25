@@ -5,8 +5,7 @@ from time import time
 
 from loguru import logger
 
-from util.Info import Info
-from util.Request import Request
+from util import Info, Request
 
 
 class Bilibili:
@@ -260,7 +259,7 @@ class Bilibili:
         return code, msg, clickable, salenum, num
 
     @logger.catch
-    def QueryParamInfo(self) -> None:  # TODO: 调用self.Info.Screen() 替代请求 getv2
+    def QueryParamInfo(self) -> None:
         """
         获取基本信息
 

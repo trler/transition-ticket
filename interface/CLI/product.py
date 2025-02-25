@@ -32,8 +32,10 @@ class ProductCli:
             "projectId": 0,
             # 场次ID
             "screenId": 0,
-            # 价格ID
+            # 票种ID
             "skuId": 0,
+            # 票价
+            "cost": 0,
             # 优惠信息
             "act": {},
         }
@@ -82,8 +84,8 @@ class ProductCli:
             try:
                 match = re.search(r"id=(\d+)", url)
                 if match:
-                    projectId = match.group(1)
-                    return int(projectId)
+                    projectId = int(match.group(1))
+                    return projectId
                 else:
                     raise InfoException("商品配置初始化", "活动URL格式错误!")
 
