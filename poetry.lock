@@ -1734,4 +1734,4 @@ reference = "TUNA"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "f8096af416d5fbef1f21319a936a08cd57abccf999fda8e109a66d38c61d1115"
+content-hash = "5e94821ee80d83738ce65509cbd725dd80a5282f8a3c2a617dd9cf8bbcf8dee3"
