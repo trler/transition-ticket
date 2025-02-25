@@ -168,7 +168,7 @@ class UserCli:
             """
             try:
                 deliver = self.info.Deliver()
-                choice = {f"{i['收货人']} - {i['手机号']} - {i['地址']}": x for x, i in enumerate(deliver)}
+                choice = {f"{i['name']} - {i['phone']} - {i['addr']}": x for x, i in enumerate(deliver)}
 
                 select = self.data.Inquire(
                     type="List",
@@ -177,7 +177,7 @@ class UserCli:
                 )
 
                 id = choice[select]
-                return deliver[id]["数据"]
+                return deliver[id]["info"]
 
             except InfoException:
                 logger.error("选择错误! 请重新打开进行配置")

@@ -158,14 +158,14 @@ class Login:
 
         文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
         """
-        resp = self.net.Response(
+        res = self.net.Response(
             method="get",
             url="https://passport.bilibili.com/x/passport-login/captcha?source=main_web",
         )
 
-        if resp["code"] == 0:
-            token = resp["data"]["token"]
-            challenge = resp["data"]["geetest"]["challenge"]
+        if res["code"] == 0:
+            token = res["data"]["token"]
+            challenge = res["data"]["geetest"]["challenge"]
             validate = self.cap.Geetest(challenge)
             seccode = validate + "|jordan"
             return token, challenge, validate, seccode
@@ -181,14 +181,14 @@ class Login:
 
         文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
         """
-        resp = self.net.Response(
+        res = self.net.Response(
             method="post",
             url="https://passport.bilibili.com/x/safecenter/captcha/pre",
         )
 
-        if resp["code"] == 0:
-            token = resp["data"]["recaptcha_token"]
-            challenge = resp["data"]["gee_challenge"]
+        if res["code"] == 0:
+            token = res["data"]["recaptcha_token"]
+            challenge = res["data"]["gee_challenge"]
             validate = self.cap.Geetest(challenge)
             seccode = validate + "|jordan"
             return token, challenge, validate, seccode
@@ -227,16 +227,16 @@ class Login:
             "source": self.source,
         }
 
-        resp = self.net.Response(
+        res = self.net.Response(
             method="post",
             url="https://passport.bilibili.com/x/passport-login/web/login",
             params=params,
         )
 
-        if resp["code"] != 0:
-            raise LoginException(f"登录失败 {resp['code']}: {resp['message']}")
+        if res["code"] != 0:
+            raise LoginException(f"登录失败 {res['code']}: {res['message']}")
 
-        if resp["data"]["status"] == 0:
+        if res["data"]["status"] == 0:
             logger.success("【登录】登录成功")
             self.cookie = self.net.GetCookie()
             return self.Status()
@@ -244,10 +244,10 @@ class Login:
         else:  # 二次短信验证登录
             logger.warning("【登录】登录失败, 需要二次验证")
 
-            resp_url = resp["data"]["url"]
-            tmp_token_match = re.search(r"tmp_token=(\w{32})", resp_url)
+            tmp_url = res["data"]["url"]
+            tmp_token_match = re.search(r"tmp_token=(\w{32})", tmp_url)
             tmp_token = tmp_token_match.group(1) if tmp_token_match else ""
-            scene_match = re.search(r"scene=([^&]+)", resp_url)
+            scene_match = re.search(r"scene=([^&]+)", tmp_url)
             scene = scene_match.group(1) if scene_match else "loginTelCheck"
 
             info = self.net.Response(
@@ -285,7 +285,7 @@ class Login:
             resend_token = resend["data"]["captcha_key"]
             verify_code = self.data.Inquire(type="Text", message="请输入验证码")
 
-            if resp["data"]["status"] == 1:
+            if res["data"]["status"] == 1:
                 data = {
                     "verify_type": "sms",
                     "tmp_code": tmp_token,
@@ -294,7 +294,7 @@ class Login:
                 }
                 url = "https://passport.bilibili.com/x/safecenter/sec/verify"
 
-            elif resp["data"]["status"] == 2:
+            elif res["data"]["status"] == 2:
                 data = {
                     "type": "loginTelCheck",
                     "tmp_code": tmp_token,
@@ -304,7 +304,7 @@ class Login:
                 url = "https://passport.bilibili.com/x/safecenter/login/tel/verify"
 
             else:
-                raise LoginException(f"未知错误: {resp['data']['status']}")
+                raise LoginException(f"未知错误: {res['data']['status']}")
 
             reverify = self.net.Response(method="post", url=url, params=data)
 
@@ -341,18 +341,18 @@ class Login:
             "seccode": seccode,
         }
 
-        resp = self.net.Response(
+        res = self.net.Response(
             method="post",
             url="https://passport.bilibili.com/x/passport-login/web/sms/send",
             params=params,
         )
 
-        if resp["code"] == 0:
+        if res["code"] == 0:
             logger.success("【登录】验证码发送成功")
-            captcha_key = resp["data"]["captcha_key"]
+            captcha_key = res["data"]["captcha_key"]
             return captcha_key
         else:
-            raise LoginException(f"验证码发送失败 {resp['code']}: {resp['message']}")
+            raise LoginException(f"验证码发送失败 {res['code']}: {res['message']}")
 
     def SMSVerify(self, tel: str, code: str, captcha_key: str) -> dict:
         """
@@ -373,16 +373,16 @@ class Login:
             "keep": False,
         }
 
-        resp = self.net.Response(
+        res = self.net.Response(
             method="post",
             url="https://passport.bilibili.com/x/passport-login/web/login/sms",
             params=params,
         )
 
-        if resp["code"] == 0:
+        if res["code"] == 0:
             logger.success("【登录】登录成功")
         else:
-            raise LoginException(f"验证码登录失败 {resp['code']}: {resp['message']}")
+            raise LoginException(f"验证码登录失败 {res['code']}: {res['message']}")
 
         self.cookie = self.net.GetCookie()
         return self.Status()
@@ -425,9 +425,9 @@ class Login:
         """
         url = ""
         params = {}
-        resp = self.net.Response(method="post", url=url, params=params)
+        res = self.net.Response(method="post", url=url, params=params)
 
-        if resp["code"] == 0:
+        if res["code"] == 0:
             logger.info("【刷新Token】刷新成功")
             return True
         else:
@@ -439,16 +439,16 @@ class Login:
         """
         退出登录
         """
-        resp = self.net.Response(
+        res = self.net.Response(
             method="post",
             url="https://passport.bilibili.com/login/exit/v2",
             params={"biliCSRF": self.net.GetCookie()["bili_jct"]},
         )
 
-        if resp["code"] == 0:
+        if res["code"] == 0:
             logger.info("【退出登录】注销Cookie成功")
             return True
-        elif resp["code"] == 2202:
+        elif res["code"] == 2202:
             logger.error("【退出登录】CSRF请求非法")
             return False
         else:

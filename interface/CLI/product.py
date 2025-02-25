@@ -103,10 +103,9 @@ class ProductCli:
                 screenInfo = self.info.ScreenList(projectId=projectId)
 
                 lists = {
-                    f"{self.YELLOW if screenInfo[i]['display_name'] == '预售中' else ''}"
-                    f"{screenInfo[i]['name']} ({screenInfo[i]['display_name']})"
-                    f"{self.RESET if screenInfo[i]['display_name'] == '预售中' else ''}": screenInfo[i]["id"]
-                    for i in range(len(screenInfo))
+                    f"{self.YELLOW if screen['display_name'] == '预售中' else ''}"
+                    f"{screen['name']} ({screen['display_name']})"
+                    f"{self.RESET if screen['display_name'] == '预售中' else ''}": screen["id"] for screen in screenInfo
                 }
                 select = self.data.Inquire(
                     type="List",

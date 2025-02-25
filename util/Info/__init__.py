@@ -165,8 +165,8 @@ class Info:
         if not lists:
             raise InfoException("购买人", "暂无购买人信息, 请到会员购平台绑定后再次使用!")
 
-        buyers_info = []
-        for _i, info in enumerate(lists):
+        dist = []
+        for info in lists:
             # 补充/删除信息
             info.pop("error_code")
             info["buyer"] = None
@@ -178,14 +178,15 @@ class Info:
             buyer_id = info["personal_id"]
             buyer_tel = info["tel"]
 
-            buyer_info = {
-                "购买人": buyer_name[0] + "*" * 1 + buyer_name[-1],
-                "身份证": buyer_id[:6] + "*" * 8 + buyer_id[-4:],
-                "手机号": buyer_tel[:3] + "*" * 4 + buyer_tel[-4:],
-                "数据": info,
-            }
-            buyers_info.append(buyer_info)
-        return buyers_info
+            dist.append(
+                {
+                    "购买人": buyer_name[0] + "*" * 1 + buyer_name[-1],
+                    "身份证": buyer_id[:6] + "*" * 8 + buyer_id[-4:],
+                    "手机号": buyer_tel[:3] + "*" * 4 + buyer_tel[-4:],
+                    "数据": info,
+                }
+            )
+        return dist
 
     def Deliver(self) -> list:
         """
@@ -203,22 +204,22 @@ class Info:
         if not lists:
             raise InfoException("收货地址", "暂无收货地址信息, 请到会员购平台绑定后再次使用!")
 
-        delivers_info = []
-        data_info = {}
-        for _i, info in enumerate(lists):
-            data_info["name"] = info["name"]
-            data_info["tel"] = info["phone"]
-            data_info["addr_id"] = info["id"]
-            data_info["addr"] = info["prov"] + info["city"] + info["area"] + info["addr"]
-
-            deliver_info = {
-                "收货人": data_info["name"],
-                "手机号": data_info["tel"],
-                "地址": data_info["addr"],
-                "数据": data_info,
-            }
-            delivers_info.append(deliver_info)
-        return delivers_info
+        dist = []
+        for info in lists:
+            dist.append(
+                {
+                    "name": info["name"],
+                    "phone": info["phone"],
+                    "addr": info["prov"] + info["city"] + info["area"] + info["addr"],
+                    "info": {
+                        "name": info["name"],
+                        "tel": info["phone"],
+                        "addr_id": info["id"],
+                        "addr": info["prov"] + info["city"] + info["area"] + info["addr"],
+                    },
+                }
+            )
+        return dist
 
     def Userinfo(self) -> dict:
         """
@@ -231,8 +232,8 @@ class Info:
             url="https://api.bilibili.com/x/space/myinfo",
         )
 
-        userinfo = {
+        dist = {
             "uid": res["data"]["mid"],
             "username": res["data"]["name"],
         }
-        return userinfo
+        return dist
