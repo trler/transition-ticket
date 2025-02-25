@@ -259,6 +259,7 @@ class Bilibili:
         self.deliverNeed = projectInfo["need_deliver"]
         self.contactNeed = not projectInfo["need_contact"]
         self.deliverFee = max(screenInfo["express_fee"], 0)
+        self.payment = self.cost * self.count + self.deliverFee
 
     @logger.catch
     def CreateOrder(self) -> tuple:
@@ -278,7 +279,7 @@ class Bilibili:
             "screen_id": self.screenId,
             "sku_id": self.skuId,
             "count": self.count,
-            "pay_money": self.cost * self.count + self.deliverFee,
+            "pay_money": self.payment,
             "order_type": self.orderType,
             "timestamp": timestamp,
             "buyer_info": json.dumps(self.buyer),
@@ -296,7 +297,6 @@ class Bilibili:
         # 邮寄票
         if self.deliverNeed:
             params["deliver_info"] = json.dumps(self.deliver, ensure_ascii=False)
-            params["pay_money"] = max(self.cost * self.count + self.deliverFee, self.payment)
             params["buyer"] = self.userinfo["username"]
             params["tel"] = self.phone
 
@@ -322,7 +322,7 @@ class Bilibili:
             # 票价错误
             case 100034:
                 self.payment = res["data"]["pay_money"]
-                logger.info(f"【创建订单】更新票价为：{self.payment / 100}")
+                logger.info(f"【创建订单】更新票价为：{(self.payment / 100):.2f}")
 
             # 未预填收货联系人信息
             case 209001:
