@@ -36,8 +36,14 @@ class Info:
 
         projectId: 项目ID
         """
-        url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}&project_id={projectId}&requestSource={self.scene}"
-        res = self.net.Response(method="get", url=url)
+        url = f"https://show.bilibili.com/api/ticket/project/getV2"
+        params = {
+            "version": "134",
+            "id": projectId,
+            "project_id": projectId,
+            "requestSource": self.scene,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
 
         base_info_id = 0
         for i, item in enumerate(res["data"]["performance_desc"]["list"]):
@@ -62,8 +68,14 @@ class Info:
 
         projectId: 项目ID
         """
-        url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}&project_id={projectId}&requestSource={self.scene}"
-        res = self.net.Response(method="get", url=url)
+        url = f"https://show.bilibili.com/api/ticket/project/getV2"
+        params = {
+            "version": "134",
+            "id": projectId,
+            "project_id": projectId,
+            "requestSource": self.scene,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
 
         screens = res["data"]["screen_list"]
         if not screens:
@@ -103,8 +115,14 @@ class Info:
 
         screenId: 场次ID
         """
-        url = f"https://show.bilibili.com/api/ticket/project/getV2?version=134&id={projectId}&project_id={projectId}&requestSource={self.scene}"
-        res = self.net.Response(method="get", url=url)
+        url = f"https://show.bilibili.com/api/ticket/project/getV2"
+        params = {
+            "version": "134",
+            "id": projectId,
+            "project_id": projectId,
+            "requestSource": self.scene,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
 
         for i in res["data"]["screen_list"]:
             if i["id"] == screenId:

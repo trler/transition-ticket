@@ -355,8 +355,13 @@ class Bilibili:
         """
         创建订单状态
         """
-        url = f"https://show.bilibili.com/api/ticket/order/createstatus?token={self.orderToken}&project_id={self.projectId}&orderId={self.orderId}"
-        res = self.net.Response(method="get", url=url)
+        url = f"https://show.bilibili.com/api/ticket/order/createstatus"
+        params = {
+            "token": self.orderToken,
+            "project_id": self.projectId,
+            "orderId": self.orderId,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
         code = res["errno"]
 
         # 100012: 订单未完成,请等待 且 订单ID相同, 说明订单已经创建
@@ -370,6 +375,9 @@ class Bilibili:
         """
         获取订单状态
         """
-        url = f"https://show.bilibili.com/api/ticket/order/info?order_id={self.orderId}"
-        res = self.net.Response(method="get", url=url)
+        url = f"https://show.bilibili.com/api/ticket/order/info"
+        params = {
+            "order_id": self.orderId,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
         return res["errno"], res["msg"]
