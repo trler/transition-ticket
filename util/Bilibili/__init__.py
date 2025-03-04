@@ -270,7 +270,7 @@ class Bilibili:
                 # 3 位 skuId 参数
                 case "skuId":
                     v1 = char.to_bytes(4, "big")
-                    v2 = v1[2:4] + b'\x20'
+                    v2 = v1[2:4] + b"\x20"
                     v3 = urlsafe_b64encode(v2).decode("utf-8")
                     v4 = v3[0:3]
                     return v4
