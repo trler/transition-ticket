@@ -1,5 +1,6 @@
 import json
 import secrets
+from base64 import urlsafe_b64encode
 from random import randint
 from time import time
 
@@ -233,6 +234,53 @@ class Bilibili:
                 self.voucher = riskParams["v_voucher"]
 
         return code, msg
+
+    @logger.catch
+    def GenerateToken(self) -> str:
+        """
+        生成Token
+
+        Base64: URLSafeBase64
+        """
+
+        def encrypt(char: int, type: str) -> str:
+            """
+            加密
+            """
+            match type:
+                # 7 位 timestamp 参数
+                case "timestamp":
+                    return "9999999"
+                # 3 位 projectId 参数
+                case "projectId":
+                    v1 = char.to_bytes(3, "big")
+                    v2 = urlsafe_b64encode(v1).decode('utf-8')
+                    v3 = v2[1:]
+                    return v3
+                # 4 位 screenId 参数
+                case "screenId":
+                    v1 = hex(char)[2:].zfill(8)
+                    v2 = bytes.fromhex(v1)
+                    v3 = urlsafe_b64encode(v2).decode('utf-8').rstrip('=')
+                    v4 = v3[2:]
+                    return v4
+                # 3 位 skuId 参数
+                case "skuId":
+                    v1 = char.to_bytes(4, 'big')
+                    v2 = v1[2:4] + b'\x20'
+                    v3 = urlsafe_b64encode(v2).decode('utf-8').rstrip('=')
+                    v4 = v3[:3]
+                    return v4
+                case _:
+                    return ""
+
+        p1 = encrypt(int(time() * 1000), "timestamp")
+        p2 = encrypt(self.projectId, "projectId")
+        p3 = encrypt(self.screenId, "screenId")
+        p4 = encrypt(self.skuId, "skuId")
+
+        token = p1 + "AA" + p2 + "AA" + p3 + "EAAQAJ" + p4 + "."
+        return token
 
     @logger.catch
     def QueryAmount(self) -> tuple:
