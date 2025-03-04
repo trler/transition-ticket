@@ -30,7 +30,7 @@ class Info:
 
         self.scene = "neul-next"
 
-    def Project(self, projectId: int) -> dict:
+    def Project(self, projectId: int) -> tuple[int, str, dict]:
         """
         项目基本信息
 
@@ -67,7 +67,7 @@ class Info:
 
         return code, msg, dist
 
-    def ScreenList(self, projectId: int) -> list[dict]:
+    def ScreenList(self, projectId: int) -> tuple[int, str, list[dict]]:
         """
         场次信息列表
 
@@ -81,40 +81,33 @@ class Info:
             "requestSource": self.scene,
         }
         res = self.net.Response(method="get", url=url, params=params)
+        code = res["errno"]
+        msg = res["msg"]
 
-        screens = res["data"]["screen_list"]
-        if not screens:
-            raise InfoException("活动详情", "该活动暂未开放票务信息")
+        match code:
+            # 成功
+            case 0:
+                screens = res["data"]["screen_list"]
+                if not screens:
+                    raise InfoException("活动详情", "该活动暂未开放票务信息")
 
-        dist = []
-        for screen in screens:
-            dist.append(
-                {
-                    "id": screen["id"],
-                    "name": screen["name"],
-                    "display_name": screen["saleFlag"]["display_name"],
-                    "sale_start": screen["sale_start"],
-                    "sale_end": screen["sale_end"],
-                    "express_fee": screen["express_fee"],
-                }
-            )
-        return dist
+                dist = []
+                for screen in screens:
+                    dist.append(
+                        {
+                            "id": screen["id"],
+                            "name": screen["name"],
+                            "display_name": screen["saleFlag"]["display_name"],
+                            "sale_start": screen["sale_start"],
+                            "sale_end": screen["sale_end"],
+                            "express_fee": screen["express_fee"],
+                        }
+                    )
+            case _:
+                dist = []
+        return code, msg, dist
 
-    def Screen(self, projectId: int, screenId: int) -> dict:
-        """
-        场次信息
-
-        projectId: 项目ID
-        screenId: 场次ID
-        """
-        screens = self.ScreenList(projectId=projectId)
-
-        for screen in screens:
-            if screen["id"] == screenId:
-                return screen
-        raise InfoException("场次查询", "指定场次不存在")
-
-    def SkuList(self, projectId: int, screenId: int) -> list[dict]:
+    def SkuList(self, projectId: int, screenId: int) -> tuple[int, str, list[dict]]:
         """
         票种信息列表
 
@@ -128,43 +121,58 @@ class Info:
             "requestSource": self.scene,
         }
         res = self.net.Response(method="get", url=url, params=params)
+        code = res["errno"]
+        msg = res["msg"]
 
-        for i in res["data"]["screen_list"]:
-            if i["id"] == screenId:
-                skus = i["ticket_list"]
-                break
+        match code:
+            # 成功
+            case 0:
+                for i in res["data"]["screen_list"]:
+                    if i["id"] == screenId:
+                        skus = i["ticket_list"]
+                        break
 
-        dist = []
-        for sku in skus:
-            dist.append(
-                {
-                    "id": sku["id"],
-                    "name": f"{sku['screen_name']} - {sku['desc']}",
-                    "display_name": sku["sale_flag"]["display_name"],
-                    "price": sku["price"],
-                    "display_price": f"{(sku['price'] / 100):.2f}",
-                    "sale_start": sku["saleStart"],
-                    "sale_end": sku["saleEnd"],
-                    "clickable": sku["clickable"],
-                    "salenum": sku["sale_flag_number"],
-                    "num": sku["num"],
-                    "act": {
-                        "act_id": sku["discount_act"]["act_id"],
-                        "act_type": sku["discount_act"]["act_type"],
-                    }
-                    if sku["discount_act"]
-                    else {},
-                }
-            )
-        return dist
+                dist = []
+                for sku in skus:
+                    dist.append(
+                        {
+                            "id": sku["id"],
+                            "name": f"{sku['screen_name']} - {sku['desc']}",
+                            "display_name": sku["sale_flag"]["display_name"],
+                            "price": sku["price"],
+                            "display_price": f"{(sku['price'] / 100):.2f}",
+                            "sale_start": sku["saleStart"],
+                            "sale_end": sku["saleEnd"],
+                            "clickable": sku["clickable"],
+                            "salenum": sku["sale_flag_number"],
+                            "num": sku["num"],
+                            "act": {
+                                "act_id": sku["discount_act"]["act_id"],
+                                "act_type": sku["discount_act"]["act_type"],
+                            }
+                            if sku["discount_act"]
+                            else {},
+                        }
+                    )
+            case _:
+                dist = []
+        return code, msg, dist
 
-    def Sku(
-        self,
-        projectId: int,
-        screenId: int,
-        skuId: int,
-        cost: int,
-    ) -> dict:
+    def Screen(self, projectId: int, screenId: int) -> dict:
+        """
+        场次信息
+
+        projectId: 项目ID
+        screenId: 场次ID
+        """
+        _, _, screens = self.ScreenList(projectId=projectId)
+
+        for screen in screens:
+            if screen["id"] == screenId:
+                return screen
+        raise InfoException("场次查询", "指定场次不存在")
+
+    def Sku(self, projectId: int, screenId: int, skuId: int, cost: int) -> dict:
         """
         票种信息
 
@@ -173,7 +181,7 @@ class Info:
         skuId: 票档ID
         cost: 价格
         """
-        skus = self.SkuList(projectId=projectId, screenId=screenId)
+        _, _, skus = self.SkuList(projectId=projectId, screenId=screenId)
 
         for sku in skus:
             if sku["id"] == skuId and sku["price"] == cost:

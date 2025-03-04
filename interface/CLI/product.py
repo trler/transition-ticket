@@ -103,8 +103,8 @@ class ProductCli:
             场次
             """
             try:
-                projectInfo = self.info.Project(projectId=projectId)
-                screenInfo = self.info.ScreenList(projectId=projectId)
+                _, _, projectInfo = self.info.Project(projectId=projectId)
+                _, _, screenInfo = self.info.ScreenList(projectId=projectId)
 
                 lists = {
                     f"{self.YELLOW if screen['display_name'] == '预售中' else ''}"
@@ -133,7 +133,7 @@ class ProductCli:
             screenId: 场次ID
             """
             try:
-                skuInfo = self.info.SkuList(projectId=projectId, screenId=screenId)
+                _, _, skuInfo = self.info.SkuList(projectId=projectId, screenId=screenId)
 
                 lists = {
                     f"{self.YELLOW if sku['display_name'] == '预售中' else ''}"
@@ -184,7 +184,7 @@ class ProductCli:
         self.config["cost"] = cost
         self.config["act"] = act
 
-        name = self.info.Project(projectId=self.config["projectId"])["name"]
+        name = self.info.Project(projectId=self.config["projectId"])[-1]["name"]
         self.conf.Save(
             FilenameStep(name=f"{name} ({skuSelected})"),
             self.config,
