@@ -191,9 +191,9 @@ class Bilibili:
             return 114514, 0
 
     @logger.catch
-    def QueryPrepare(self) -> tuple:
+    def QueryToken(self) -> tuple:
         """
-        获取准备信息
+        获取Token
         """
         # 成功
         if not self.risked:
@@ -220,7 +220,7 @@ class Bilibili:
         match code:
             # 成功
             case 0:
-                token = res["data"]["token"]
+                self.token = res["data"]["token"]
             # 验证
             case -401:
                 riskParams = res["data"]["ga_data"]["riskParams"]
@@ -231,17 +231,7 @@ class Bilibili:
                 self.scene = riskParams["scene"]
                 self.ua = riskParams["ua"]
                 self.voucher = riskParams["v_voucher"]
-                token = ""
 
-        return code, msg, token
-
-    @logger.catch
-    def QueryToken(self) -> tuple:
-        """
-        获取Token
-        """
-        code, msg, token = self.QueryPrepare()
-        self.token = "9" * 7 + token[7:]
         return code, msg
 
     @logger.catch
