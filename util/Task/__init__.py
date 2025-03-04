@@ -375,11 +375,11 @@ class Task:
                     case "geetest":
                         logger.info(f"【验证】验证类型为极验验证码! 流水号: {data}")
                         validate = self.cap.Geetest(data)
-                        self.riskProcessCode, msg = self.api.RiskValidate(validate=validate)
+                        self.riskProcessCode, msg = self.api.RiskValidate(val=validate)
 
                     case "phone":
                         logger.info(f"【验证】验证类型为手机号确认验证! 绑定手机号: {data}")
-                        self.riskProcessCode, msg = self.api.RiskValidate(validateMode="phone")
+                        self.riskProcessCode, msg = self.api.RiskValidate(mode="phone")
 
                     case _:
                         logger.error(f"【验证】{type}类型验证暂未支持!")

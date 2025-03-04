@@ -86,7 +86,7 @@ class Bilibili:
         self.gt = ""
 
     @logger.catch
-    def RiskInfo(self) -> tuple:
+    def RiskInfo(self) -> tuple[int, str, str, str]:
         """
         获取流水
         """
@@ -129,23 +129,23 @@ class Bilibili:
         return code, msg, type, dist
 
     @logger.catch
-    def RiskValidate(self, validate: str = "", validateMode: str = "geetest") -> tuple:
+    def RiskValidate(self, val: str = "", mode: str = "geetest") -> tuple[int, str]:
         """
         校验
 
-        validate: 校验值
-        validateMode: 验证方式
+        val: 校验值
+        mode: 验证方式
         """
         url = "https://api.bilibili.com/x/gaia-vgate/v1/validate"
 
-        match validateMode:
+        match mode:
             case "geetest":
                 params = {
                     "challenge": self.challenge,
                     "csrf": self.net.GetCookie()["bili_jct"],
-                    "seccode": validate + "|jordan",
+                    "seccode": val + "|jordan",
                     "token": self.token,
-                    "validate": validate,
+                    "validate": val,
                 }
             case "phone":
                 params = {
@@ -171,7 +171,7 @@ class Bilibili:
         return code, msg
 
     @logger.catch
-    def QuerySaleStartTime(self) -> tuple:
+    def QuerySaleStartTime(self) -> tuple[int, str, int]:
         """
         获取开票时间
         """
@@ -192,7 +192,7 @@ class Bilibili:
         return code, msg, saleStart
 
     @logger.catch
-    def QueryToken(self) -> tuple:
+    def QueryToken(self) -> tuple[int, str]:
         """
         获取Token
         """
@@ -287,7 +287,7 @@ class Bilibili:
         return token
 
     @logger.catch
-    def QueryAmount(self) -> tuple:
+    def QueryAmount(self) -> tuple[int, str, bool, int, int]:
         """
         获取票数
         """
@@ -331,7 +331,7 @@ class Bilibili:
         self.payment = self.cost * self.count + self.deliverFee
 
     @logger.catch
-    def CreateOrder(self) -> tuple:
+    def CreateOrder(self) -> tuple[int, str]:
         """
         创建订单
         """
@@ -413,7 +413,7 @@ class Bilibili:
         return code, msg
 
     @logger.catch
-    def CreateOrderStatus(self) -> tuple:
+    def CreateOrderStatus(self) -> tuple[int, str]:
         """
         创建订单状态
         """
@@ -434,7 +434,7 @@ class Bilibili:
         return code, msg
 
     @logger.catch
-    def QueryOrderStatus(self) -> tuple:
+    def QueryOrderStatus(self) -> tuple[int, str]:
         """
         获取订单状态
         """
