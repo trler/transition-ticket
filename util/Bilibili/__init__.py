@@ -284,7 +284,7 @@ class Bilibili:
         p4 = encrypt(self.skuId, "skuId")
         token = "w" + p1 + "AA" + p2 + "AA" + p3 + "EAAQAJ" + p4 + "."
 
-        if token [7:] == self.token[7:]:
+        if token[7:] == self.token[7:]:
             code = 0
             msg = ""
             self.token = token
