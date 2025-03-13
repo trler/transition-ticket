@@ -210,7 +210,8 @@ class Task:
             # 有票
             conditions=lambda: self.queryTicketCode
             # 超过定时刷新时间 && 未跳过
-            or self.skipTokenCode == -1 and not self.data.TimestampCheck(
+            or self.skipTokenCode == -1
+            and not self.data.TimestampCheck(
                 timestamp=self.refreshTime,
                 duration=self.refreshInterval,
             ),
@@ -487,8 +488,8 @@ class Task:
             # 不知道
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】429! 服务器卡卡卡咔咔咔咔卡卡卡")
-                    self.createOrderCode = 429
+                    logger.warning("【获取Token】429! 服务器卡卡卡咔咔咔咔卡卡卡")
+                    self.queryTokenCode = 429
                 else:
                     logger.error(f"【获取Token】{self.queryTokenCode}: {msg}")
 
