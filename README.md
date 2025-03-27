@@ -3,7 +3,6 @@
 ## 声明
 
 [电报交流群](https://t.me/bilibili_ticket)
-[下载](https://github.com/biliticket/transition-ticket/releases)
 
 本程序仅供学习交流, 不得用于商业用途,
 
@@ -15,6 +14,18 @@
 
 黄牛 / 收费代抢４０００＋
 
+## 下载使用
+
+对于大型漫展活动, 请使用 Stable 版
+
+对于小型活动, 可以使用 Nightly 版本
+
+[Releases](https://github.com/biliticket/transition-ticket/releases)
+
+[Nightly Release](https://github.com/biliticket/transition-ticket/releases/tag/v7.191.9810)
+
+[Stable Release](https://github.com/biliticket/transition-ticket/releases/tag/v7.114.514)
+
 ### 注意事项
 
 1. MacOS / Linux 用户请根据 *手动安装* 流程安装进行使用
@@ -23,7 +34,7 @@
 
 ### 手动安装
 
-- Python >= 3.10 , < 3.14
+- Python >= 3.10 , < 3.13
 
 ```bash
 # MacOS
@@ -49,7 +60,7 @@ python cli.py
 
 ## 开发
 
-- Python >= 3.10 , < 3.14
+- Python >= 3.10 , < 3.13
 
 ```bash
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
