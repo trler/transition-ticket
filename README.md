@@ -34,7 +34,7 @@
 
 ### 手动安装
 
-- Python >= 3.10 , < 3.13
+- Python >= 3.10 , < 3.14
 
 ```bash
 # MacOS
@@ -60,7 +60,7 @@ python cli.py
 
 ## 开发
 
-- Python >= 3.10 , < 3.13
+- Python >= 3.10 , < 3.14
 
 ```bash
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
