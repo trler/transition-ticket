@@ -197,10 +197,8 @@ class Info:
 
         接口: GET https://show.bilibili.com/api/ticket/buyer/list?is_default&projectId=${projectId}
         """
-        res = self.net.Response(
-            method="get",
-            url="https://show.bilibili.com/api/ticket/buyer/list",
-        )
+        url = "https://show.bilibili.com/api/ticket/buyer/list"
+        res = self.net.Response(method="get", url=url)
 
         lists = res["data"]["list"]
 
@@ -236,21 +234,14 @@ class Info:
     def Deliver(self) -> list:
         """
         收货地址
-
-        接口: GET https://show.bilibili.com/api/ticket/addr/list
         """
-        res = self.net.Response(
-            method="get",
-            url="https://show.bilibili.com/api/ticket/addr/list",
-        )
+        url = "https://show.bilibili.com/api/ticket/addr/list"
+        res = self.net.Response(method="get", url=url)
 
         lists = res["data"]["addr_list"]
 
         if not lists:
-            raise InfoException(
-                "收货地址",
-                "暂无收货地址信息, 请到会员购平台绑定后再次使用!",
-            )
+            raise InfoException("收货地址", "暂无收货地址信息, 请到会员购平台绑定后再次使用!")
 
         dist = []
         for info in lists:
@@ -271,17 +262,54 @@ class Info:
 
     def Userinfo(self) -> dict:
         """
-        UID Username
-
-        接口: GET https://api.bilibili.com/x/space/myinfo
+        用户信息
         """
-        res = self.net.Response(
-            method="get",
-            url="https://api.bilibili.com/x/space/myinfo",
-        )
+        url = "https://api.bilibili.com/x/space/myinfo"
+        res = self.net.Response(method="get", url=url)
 
         dist = {
             "uid": res["data"]["mid"],
             "username": res["data"]["name"],
         }
+        return dist
+
+    def District(self) -> dict:
+        """
+        地区
+        """
+        url = "https://show.bilibili.com/api/ticket/district/geocoder"
+        res = self.net.Response(method="get", url=url)
+
+        dist = {
+            "adcode": res["data"]["adcode"],
+            "country": res["data"]["country"],
+            "province": res["data"]["province"],
+        }
+        return dist
+
+    def SearchList(self, keyword: str, page: int = 1) -> list[dict]:
+        """
+        搜索
+        """
+        url = "https://show.bilibili.com/api/ticket/search/list"
+        params = {
+            "version": "134",
+            "platform": "web",
+            "keyword": keyword,
+            "pagesize": "20",
+            "page": page,
+        }
+        res = self.net.Response(method="get", url=url, params=params)
+
+        dist = []
+        for project in res["data"]["result"]:
+            dist.append(
+                {
+                    # "id": project["id"],
+                    "project_name": project["project_name"],
+                    # "sale_start": project["sale_start"],
+                    "sale_flag": project["sale_flag"],
+                    "countdown_flag": project["countdown"],
+                }
+            )
         return dist
