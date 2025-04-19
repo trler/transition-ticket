@@ -105,13 +105,50 @@ class ProductCli:
                 return ProjectStep()
 
         @logger.catch
-        def ScreenStep(projectId: int) -> tuple:
+        def GoodsStep(projectId: int) -> int:
+            """
+            商品
+            
+            projectId: 活动ID
+            """
+            try:
+                _, _, projectInfo = self.info.QueryProject(projectId=projectId)
+                _, _, goodsInfo = self.info.QueryGoods(projectId=projectId)
+
+                if not goodsInfo:
+                    return 0
+
+                lists = {
+                    f"{self.YELLOW if i['display_name'] == '预售中' else ''}"
+                    f"{i['name']} ({i['display_name']})"
+                    f"{self.RESET if i['display_name'] == '预售中' else ''}": i["link_id"]
+                    for i in goodsInfo
+                }
+                select = self.data.Inquire(
+                    type="List",
+                    message=f"您选择的活动是:{projectInfo['name']}, 接下来请选择商品",
+                    choices=list(lists.keys()),
+                )
+                return lists[select]
+
+            except InfoException:
+                logger.exception("请重新配置活动信息!")
+                logger.warning("程序正在准备退出...")
+                sleep(5)
+                sys.exit()
+
+        @logger.catch
+        def ScreenStep(projectId: int, linkId: int) -> int:
             """
             场次
             """
             try:
                 _, _, projectInfo = self.info.QueryTicketProject(projectId=projectId)
                 _, _, screenInfo = self.info.QueryTicketScreen(projectId=projectId)
+                
+                if linkId:
+                    _, _, specInfo = self.info.QueryGoodsSpec(linkId=linkId)
+                    screenInfo = screenInfo + specInfo
 
                 lists = {
                     f"{self.YELLOW if screen['saleflag'] == '预售中' else ''}"
@@ -139,15 +176,20 @@ class ProductCli:
                 sys.exit()
 
         @logger.catch
-        def SkuStep(projectId: int, screenId: int) -> tuple:
+        def SkuStep(projectId: int, linkId: int, screenId: int) -> tuple:
             """
             价位
 
             screenId: 场次ID
             """
             try:
-                _, _, skuInfo = self.info.QueryTicketSku(projectId=projectId, screenId=screenId)
 
+                if linkId:
+                    _, _, skuInfo = self.info.QueryGoodsSku(linkId=linkId, specId=screenId)
+                else:
+                    _, _, skuInfo = self.info.QueryTicketSku(projectId=projectId, screenId=screenId)
+                    
+                
                 lists = {
                     f"{self.YELLOW if sku['saleflag'] == '预售中' else ''}"
                     f"{sku['name']} {sku['display_price']}元 ({sku['saleflag']})"

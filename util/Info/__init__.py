@@ -29,7 +29,7 @@ class Info:
         self.net = net
 
         self.scene = "neul-next"
-        self.sale_flag_map = {
+        self.saleFlagMap = {
             1: "不可售",
             2: "预售中",
             3: "已停售",
@@ -107,10 +107,11 @@ class Info:
                 for good in goods:
                     dist.append(
                         {
-                            "project_type": 3,
                             "link_id": good["id"],
+                            "item_id": good["item_id"],
                             "name": good["detail"]["name"],
                             "display_name": good["sale_flag_txt"],
+                            "sale_flag": good["sale_flag"],
                         }
                     )
             case _:
@@ -137,7 +138,9 @@ class Info:
         match code:
             # 成功
             case 0:
-                screens = res["data"]["screen_list"]
+                data = res["data"]
+                screens = data["screen_list"]
+
                 if not screens:
                     raise InfoException("活动详情", "该活动暂未开放票务信息")
 
@@ -145,6 +148,7 @@ class Info:
                 for screen in screens:
                     dist.append(
                         {
+                            "project_id": data["id"],
                             "id": screen["id"],
                             "name": screen["name"],
                             "sale_start": screen["sale_start"],
@@ -275,14 +279,15 @@ class Info:
                         {
                             "id": sku["id"],
                             "name": f"{goods['name']} - {spec['name']} - {sku['desc']}",
-                            "display_name": self.sale_flag_map[sku["sale_flag_number"]],
+                            "display_name": self.saleFlagMap[sku["sale_flag_number"]],
                             "price": sku["price"],
                             "display_price": f"{(sku['price'] / 100):.2f}",
-                            "sale_start": spec["saleStart"],
-                            "sale_end": spec["saleEnd"],
+                            "sale_start": spec["sale_start"],
+                            "sale_end": spec["sale_end"],
                             "clickable": sku["clickable"],
                             "salenum": sku["sale_flag_number"],
                             "num": sku["num"],
+                            "act": {},
                         }
                     )
             case _:
