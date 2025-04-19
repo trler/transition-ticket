@@ -296,7 +296,7 @@ class Info:
 
         return code, msg, dist
 
-    def Screen(self, projectId: int, screenId: int) -> tuple[int, str, dict]:
+    def QueryScreen(self, projectId: int, screenId: int) -> tuple[int, str, dict]:
         """
         场次信息
 
@@ -311,7 +311,7 @@ class Info:
 
         raise InfoException("场次查询", "指定场次不存在")
 
-    def Sku(self, projectId: int, screenId: int, skuId: int, cost: int) -> tuple[int, str, dict]:
+    def QuerySku(self, projectId: int, screenId: int, skuId: int, cost: int) -> tuple[int, str, dict]:
         """
         票种信息
 
@@ -328,7 +328,7 @@ class Info:
 
         raise InfoException("场次查询", "指定票种不存在")
 
-    def Buyer(self) -> list:
+    def QueryBuyer(self) -> list:
         """
         购买人
 
@@ -368,7 +368,7 @@ class Info:
             )
         return dist
 
-    def Deliver(self) -> list:
+    def QueryDeliver(self) -> list:
         """
         收货地址
         """
@@ -397,7 +397,7 @@ class Info:
             )
         return dist
 
-    def Userinfo(self) -> dict:
+    def QueryUserinfo(self) -> dict:
         """
         用户信息
         """
@@ -410,7 +410,7 @@ class Info:
         }
         return dist
 
-    def District(self) -> dict:
+    def QueryDistrict(self) -> dict:
         """
         地区
         """
@@ -424,7 +424,7 @@ class Info:
         }
         return dist
 
-    def SearchList(self, keyword: str, page: int = 1) -> list[dict]:
+    def QuerySearchList(self, keyword: str, page: int = 1) -> list[dict]:
         """
         搜索
         """

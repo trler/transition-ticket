@@ -154,7 +154,7 @@ class UserCli:
             购买人
             """
             try:
-                buyerInfo = self.info.Buyer()
+                buyerInfo = self.info.QueryBuyer()
                 choice = {f"{i['购买人']} - {i['身份证']} - {i['手机号']}": x for x, i in enumerate(buyerInfo)}
 
                 select = self.data.Inquire(
@@ -184,7 +184,7 @@ class UserCli:
             收货信息
             """
             try:
-                deliver = self.info.Deliver()
+                deliver = self.info.QueryDeliver()
                 choice = {f"{i['name']} - {i['phone']} - {i['addr']}": x for x, i in enumerate(deliver)}
 
                 select = self.data.Inquire(
@@ -238,7 +238,7 @@ class UserCli:
         self.config["buyer"] = BuyerStep()
         self.config["deliver"] = DeliverStep()
         self.config["phone"] = PhoneStep()
-        self.config["userinfo"] = self.info.Userinfo()
+        self.config["userinfo"] = self.info.QueryUserinfo()
 
         name = [i["name"] for i in self.config["buyer"]]
         self.conf.Save(

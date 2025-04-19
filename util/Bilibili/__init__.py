@@ -303,11 +303,32 @@ class Bilibili:
         return code, msg, saleStart
 
     @logger.catch
+    def QuerySaleStartTime(self) -> tuple[int, str, int]:
+        """
+        获取开票时间
+        """
+        code, msg, skuInfo = self.info.QuerySku(
+            projectId=self.projectId,
+            screenId=self.screenId,
+            skuId=self.skuId,
+            cost=self.cost,
+        )
+
+        match code:
+            # 成功
+            case 0:
+                saleStart = skuInfo["sale_start"]
+            case _:
+                saleStart = 0
+
+        return code, msg, saleStart
+
+    @logger.catch
     def QueryAmount(self) -> tuple[int, str, bool, int, int]:
         """
         获取票数
         """
-        code, msg, skuInfo = self.info.Sku(
+        code, msg, skuInfo = self.info.QuerySku(
             projectId=self.projectId,
             screenId=self.screenId,
             skuId=self.skuId,
