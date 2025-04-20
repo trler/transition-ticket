@@ -119,9 +119,9 @@ class ProductCli:
                     return 0
 
                 lists = {
-                    f"{self.YELLOW if i['display_name'] == '预售中' else ''}"
-                    f"{i['name']} ({i['display_name']})"
-                    f"{self.RESET if i['display_name'] == '预售中' else ''}": i["link_id"]
+                    f"{self.YELLOW if i['saleflag'] == '预售中' else ''}"
+                    f"{i['name']} ({i['saleflag']})"
+                    f"{self.RESET if i['saleflag'] == '预售中' else ''}": i
                     for i in goodsInfo
                 }
                 select = self.data.Inquire(
@@ -129,7 +129,7 @@ class ProductCli:
                     message=f"您选择的活动是:{projectInfo['name']}, 接下来请选择商品",
                     choices=list(lists.keys()),
                 )
-                return lists[select]
+                return lists[select]["link_id"]
 
             except InfoException:
                 logger.exception("请重新配置活动信息!")
@@ -232,8 +232,10 @@ class ProductCli:
         print("下面开始配置商品!")
 
         projectId = ProjectStep()
-        screenId, expressFee, projectName, needDeliver, needContact = ScreenStep(projectId=projectId)
-        skuId, skuSelected, saleStart, cost, act = SkuStep(projectId=projectId, screenId=screenId)
+        linkId = GoodsStep(projectId=projectId)
+        
+        screenId, expressFee, projectName, needDeliver, needContact = ScreenStep(projectId=projectId, linkId=linkId)
+        skuId, skuSelected, saleStart, cost, act = SkuStep(projectId=projectId, linkId=linkId, screenId=screenId)
 
         self.config["projectId"] = projectId
         self.config["screenId"] = screenId

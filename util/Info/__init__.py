@@ -110,8 +110,8 @@ class Info:
                             "link_id": good["id"],
                             "item_id": good["item_id"],
                             "name": good["detail"]["name"],
-                            "display_name": good["sale_flag_txt"],
-                            "sale_flag": good["sale_flag"],
+                            "salenum": good["sale_flag"],
+                            "saleflag": good["sale_flag_txt"],
                         }
                     )
             case _:
@@ -237,10 +237,11 @@ class Info:
                         {
                             "id": screen["id"],
                             "name": screen["name"],
-                            "display_name": self.sale_flag_map[screen["sale_flag_number"]],
                             "sale_start": screen["sale_start"],
                             "sale_end": screen["sale_end"],
                             "express_fee": screen["express_fee"],
+                            "salenum": screen["sale_flag_number"],
+                            "saleflag": self.sale_flag_map[screen["sale_flag_number"]],
                         }        
                     )
             case _:
@@ -279,13 +280,13 @@ class Info:
                         {
                             "id": sku["id"],
                             "name": f"{goods['name']} - {spec['name']} - {sku['desc']}",
-                            "display_name": self.saleFlagMap[sku["sale_flag_number"]],
                             "price": sku["price"],
                             "display_price": f"{(sku['price'] / 100):.2f}",
                             "sale_start": spec["sale_start"],
                             "sale_end": spec["sale_end"],
                             "clickable": sku["clickable"],
                             "salenum": sku["sale_flag_number"],
+                            "saleflag": self.saleFlagMap[sku["sale_flag_number"]],
                             "num": sku["num"],
                             "act": {},
                         }
