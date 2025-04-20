@@ -22,6 +22,9 @@ class Bilibili:
         projectId: int,
         screenId: int,
         skuId: int,
+        saleStart: int,
+        needDeliver: bool,
+        needContact: bool,
         act: dict,
         buyer: dict,
         deliver: dict,
@@ -30,6 +33,7 @@ class Bilibili:
         orderType: int = 1,
         count: int = 1,
         cost: int = 0,
+        deliverFee: int = 0,
     ):
         """
         初始化
@@ -38,7 +42,10 @@ class Bilibili:
         projectId: 项目ID
         screenId: 场次ID
         skuId: 商品ID
-        actId: 优惠信息
+        saleStart: 开始时间戳
+        needDeliver: 是否需要填写收货信息
+        needContact: 是否需要填写联系人信息
+        act: 优惠信息
         buyer: 购买者信息
         deliver: 收货信息
         phone: 手机号
@@ -46,6 +53,7 @@ class Bilibili:
         orderType: 订单类型
         count: 购买数量
         cost: 订单单价
+        deliverFee: 运费
         """
         self.net = net
         self.info = Info(net=net)
@@ -57,7 +65,13 @@ class Bilibili:
         self.skuId = skuId
         self.count = count
         self.cost = cost
+        self.deliverFee = deliverFee
+        self.saleStart = saleStart
 
+        self.payment = self.count * self.cost + self.deliverFee
+
+        self.needDeliver = needDeliver
+        self.needContact = needContact
         self.act = act
         self.buyer = buyer
         self.phone = phone
@@ -69,12 +83,6 @@ class Bilibili:
         self.orderToken = ""
         self.token = ""
         self.risked = False
-
-        self.saleStart = 0
-        self.deliverNeed = False
-        self.contactNeed = False
-        self.deliverFee = 0
-        self.payment = 0
 
         self.buvid = ""
         self.decisionType = ""
@@ -169,27 +177,6 @@ class Bilibili:
             self.net.RefreshCookie(cookie)
 
         return code, msg
-
-    @logger.catch
-    def QuerySaleStartTime(self) -> tuple[int, str, int]:
-        """
-        获取开票时间
-        """
-        code, msg, skuInfo = self.info.Sku(
-            projectId=self.projectId,
-            screenId=self.screenId,
-            skuId=self.skuId,
-            cost=self.cost,
-        )
-
-        match code:
-            # 成功
-            case 0:
-                saleStart = skuInfo["sale_start"]
-            case _:
-                saleStart = 0
-
-        return code, msg, saleStart
 
     @logger.catch
     def QueryToken(self) -> tuple[int, str]:
@@ -295,6 +282,27 @@ class Bilibili:
         return 0, token
 
     @logger.catch
+    def QuerySaleStartTime(self) -> tuple[int, str, int]:
+        """
+        获取开票时间
+        """
+        code, msg, skuInfo = self.info.Sku(
+            projectId=self.projectId,
+            screenId=self.screenId,
+            skuId=self.skuId,
+            cost=self.cost,
+        )
+
+        match code:
+            # 成功
+            case 0:
+                saleStart = skuInfo["sale_start"]
+            case _:
+                saleStart = 0
+
+        return 0, "", self.saleStart
+
+    @logger.catch
     def QueryAmount(self) -> tuple[int, str, bool, int, int]:
         """
         获取票数
@@ -320,25 +328,6 @@ class Bilibili:
         return code, msg, clickable, salenum, num
 
     @logger.catch
-    def QueryCacheInfo(self) -> None:
-        """
-        获取缓存信息
-
-        self.deliverFee: 邮费
-        self.deliverNeed: 是否需要邮寄
-        self.contactNeed: 是否需要联系人
-        """
-        _, _, projectInfo = self.info.Project(projectId=self.projectId)
-        _, _, screenInfo = self.info.Screen(projectId=self.projectId, screenId=self.screenId)
-        _, _, skuInfo = self.info.Sku(projectId=self.projectId, screenId=self.screenId, skuId=self.skuId, cost=self.cost)
-
-        self.saleStart = skuInfo["sale_start"] * 1000
-        self.deliverNeed = projectInfo["need_deliver"]
-        self.contactNeed = not projectInfo["need_contact"]
-        self.deliverFee = max(screenInfo["express_fee"], 0)
-        self.payment = self.cost * self.count + self.deliverFee
-
-    @logger.catch
     def CreateOrder(self) -> tuple[int, str]:
         """
         创建订单
@@ -351,7 +340,7 @@ class Bilibili:
             # "y": randint(20, 100),
             "y": randint(2400, 2500),
             # "origin": timestamp - randint(1500, 10000),
-            "origin": max(self.saleStart, timestamp - randint(1500, 10000)),
+            "origin": max(self.saleStart * 1000, timestamp - randint(1500, 10000)),
             "now": timestamp,
         }
         params = {
@@ -375,13 +364,13 @@ class Bilibili:
             params["order_type"] = self.act["act_type"]
 
         # 邮寄票
-        if self.deliverNeed:
+        if self.needDeliver:
             params["deliver_info"] = json.dumps(self.deliver, ensure_ascii=False)
             params["buyer"] = self.userinfo["username"]
             params["tel"] = self.phone
 
         # 联系人信息
-        if self.contactNeed:
+        if self.needContact:
             params["buyer"] = self.userinfo["username"]
             params["tel"] = self.phone
 
@@ -415,7 +404,7 @@ class Bilibili:
                     },
                 )
                 if tmp["errno"] == 0:
-                    self.contactNeed = True
+                    self.needContact = True
                     logger.info("【创建订单】已自动设置收货联系人信息")
 
         return code, msg

@@ -98,7 +98,7 @@ class ProductCli:
                 return ProjectStep()
 
         @logger.catch
-        def ScreenStep(projectId: int) -> int:
+        def ScreenStep(projectId: int) -> tuple:
             """
             场次
             """
@@ -107,9 +107,9 @@ class ProductCli:
                 _, _, screenInfo = self.info.ScreenList(projectId=projectId)
 
                 lists = {
-                    f"{self.YELLOW if screen['display_name'] == '预售中' else ''}"
-                    f"{screen['name']} ({screen['display_name']})"
-                    f"{self.RESET if screen['display_name'] == '预售中' else ''}": screen["id"]
+                    f"{self.YELLOW if screen['saleflag'] == '预售中' else ''}"
+                    f"{screen['name']} ({screen['saleflag']})"
+                    f"{self.RESET if screen['saleflag'] == '预售中' else ''}": screen
                     for screen in screenInfo
                 }
                 select = self.data.Inquire(
@@ -117,7 +117,13 @@ class ProductCli:
                     message=f"您选择的活动是:{projectInfo['name']}, 接下来请选择场次",
                     choices=list(lists.keys()),
                 )
-                return lists[select]
+                return (
+                    lists[select]["id"],
+                    lists[select]["express_fee"],
+                    projectInfo["name"],
+                    projectInfo["need_deliver"],
+                    projectInfo["need_contact"],
+                )
 
             except InfoException:
                 logger.exception("请重新配置活动信息!")
@@ -136,9 +142,9 @@ class ProductCli:
                 _, _, skuInfo = self.info.SkuList(projectId=projectId, screenId=screenId)
 
                 lists = {
-                    f"{self.YELLOW if sku['display_name'] == '预售中' else ''}"
-                    f"{sku['name']} {sku['display_price']}元 ({sku['display_name']})"
-                    f"{self.RESET if sku['display_name'] == '预售中' else ''}": sku
+                    f"{self.YELLOW if sku['saleflag'] == '预售中' else ''}"
+                    f"{sku['name']} {sku['display_price']}元 ({sku['saleflag']})"
+                    f"{self.RESET if sku['saleflag'] == '预售中' else ''}": sku
                     for sku in skuInfo
                 }
                 select = self.data.Inquire(
@@ -149,6 +155,7 @@ class ProductCli:
                 return (
                     lists[select]["id"],
                     lists[select]["name"] + " " + lists[select]["display_price"],
+                    lists[select]["sale_start"],
                     lists[select]["price"],
                     lists[select]["act"],
                 )
@@ -175,18 +182,22 @@ class ProductCli:
 
         print("下面开始配置商品!")
 
-        self.config["projectId"] = ProjectStep()
+        projectId = ProjectStep()
+        screenId, expressFee, projectName, needDeliver, needContact = ScreenStep(projectId=projectId)
+        skuId, skuSelected, saleStart, cost, act = SkuStep(projectId=projectId, screenId=screenId)
 
-        self.config["screenId"] = ScreenStep(projectId=self.config["projectId"])
-
-        skuId, skuSelected, cost, act = SkuStep(projectId=self.config["projectId"], screenId=self.config["screenId"])
+        self.config["projectId"] = projectId
+        self.config["screenId"] = screenId
         self.config["skuId"] = skuId
+        self.config["saleStart"] = saleStart
         self.config["cost"] = cost
+        self.config["deliverFee"] = max(expressFee, 0)
         self.config["act"] = act
+        self.config["needDeliver"] = needDeliver
+        self.config["needContact"] = needContact
 
-        name = self.info.Project(projectId=self.config["projectId"])[-1]["name"]
         self.conf.Save(
-            FilenameStep(name=f"{name} ({skuSelected})"),
+            FilenameStep(name=f"{projectName} ({skuSelected})"),
             self.config,
         )
         logger.info("【商品配置初始化】配置已保存!")

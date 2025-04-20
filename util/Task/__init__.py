@@ -70,7 +70,6 @@ class Task:
         ]
 
         # Code
-        self.queryCache = False
         self.countdownCode = 114514
         self.skipTokenCode = 114514
         self.queryTokenCode = 114514
@@ -384,10 +383,7 @@ class Task:
         """
         预处理
         """
-        logger.info("【预处理】正在缓存商品信息...")
-        self.api.QueryCacheInfo()
-        self.queryCache = True
-
+        logger.info("【预处理】正在预处理信息...")
         self.generateTokenCode, msg = self.api.GenerateToken()
         match self.generateTokenCode:
             # 成功
@@ -444,13 +440,6 @@ class Task:
                     self.queryTokenCode = 429
                 else:
                     logger.error(f"【获取Token】{self.queryTokenCode}: {msg}")
-
-        # 顺路
-        if not self.queryCache and self.countdownCode == 0:
-            self.api.QueryCacheInfo()
-            self.api.GenerateToken()
-            self.queryCache = True
-            logger.info("【获取Token】已缓存商品信息")
 
     @logger.catch
     def RiskProcessAction(self) -> None:

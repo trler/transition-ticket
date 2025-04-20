@@ -60,7 +60,7 @@ class Info:
                     "name": res["data"]["name"],
                     "time": res["data"]["performance_desc"]["list"][base]["details"][0]["content"],
                     "need_deliver": res["data"]["has_paper_ticket"],
-                    "need_contact": res["data"]["need_contact"],
+                    "need_contact": not res["data"]["need_contact"],
                 }
             case _:
                 dist = {}
@@ -97,10 +97,11 @@ class Info:
                         {
                             "id": screen["id"],
                             "name": screen["name"],
-                            "display_name": screen["saleFlag"]["display_name"],
                             "sale_start": screen["sale_start"],
                             "sale_end": screen["sale_end"],
                             "express_fee": screen["express_fee"],
+                            "salenum": screen["sale_flag_number"],
+                            "saleflag": screen["saleFlag"]["display_name"],
                         }
                     )
             case _:
@@ -139,20 +140,18 @@ class Info:
                         {
                             "id": sku["id"],
                             "name": f"{sku['screen_name']} - {sku['desc']}",
-                            "display_name": sku["sale_flag"]["display_name"],
                             "price": sku["price"],
                             "display_price": f"{(sku['price'] / 100):.2f}",
                             "sale_start": sku["saleStart"],
                             "sale_end": sku["saleEnd"],
                             "clickable": sku["clickable"],
                             "salenum": sku["sale_flag_number"],
+                            "saleflag": sku["sale_flag"]["display_name"],
                             "num": sku["num"],
                             "act": {
                                 "act_id": sku["discount_act"]["act_id"],
                                 "act_type": sku["discount_act"]["act_type"],
-                            }
-                            if sku["discount_act"]
-                            else {},
+                            } if sku["discount_act"] else {},
                         }
                     )
             case _:
