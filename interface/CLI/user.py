@@ -238,7 +238,7 @@ class UserCli:
         self.config["buyer"] = BuyerStep()
         self.config["deliver"] = DeliverStep()
         self.config["phone"] = PhoneStep()
-        self.config["userinfo"] = self.info.QueryUserinfo()
+        self.config["user"] = self.info.QueryUser()
 
         name = [i["name"] for i in self.config["buyer"]]
         self.conf.Save(

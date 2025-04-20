@@ -20,6 +20,7 @@ class Bilibili:
         self,
         net: Request,
         projectId: int,
+        linkId: int,
         screenId: int,
         skuId: int,
         saleStart: int,
@@ -29,7 +30,7 @@ class Bilibili:
         buyer: dict,
         deliver: dict,
         phone: str,
-        userinfo: dict,
+        user: dict,
         orderType: int = 1,
         count: int = 1,
         cost: int = 0,
@@ -40,8 +41,9 @@ class Bilibili:
 
         net: 网络实例
         projectId: 项目ID
+        linkId: 商品ID
         screenId: 场次ID
-        skuId: 商品ID
+        skuId: 票种ID
         saleStart: 开始时间戳
         needDeliver: 是否需要填写收货信息
         needContact: 是否需要填写联系人信息
@@ -49,7 +51,7 @@ class Bilibili:
         buyer: 购买者信息
         deliver: 收货信息
         phone: 手机号
-        userinfo: 用户信息
+        user: 用户信息
         orderType: 订单类型
         count: 购买数量
         cost: 订单单价
@@ -61,6 +63,7 @@ class Bilibili:
         self.scene = "neul-next"
 
         self.projectId = projectId
+        self.linkId = linkId
         self.screenId = screenId
         self.skuId = skuId
         self.count = count
@@ -76,7 +79,7 @@ class Bilibili:
         self.buyer = buyer
         self.phone = phone
         self.deliver = deliver
-        self.userinfo = userinfo
+        self.user = user
 
         self.orderType = orderType
         self.orderId = 0
@@ -286,29 +289,9 @@ class Bilibili:
         """
         获取开票时间
         """
-        code, msg, skuInfo = self.info.Sku(
-            projectId=self.projectId,
-            screenId=self.screenId,
-            skuId=self.skuId,
-            cost=self.cost,
-        )
-
-        match code:
-            # 成功
-            case 0:
-                saleStart = skuInfo["sale_start"]
-            case _:
-                saleStart = 0
-
-        return code, msg, saleStart
-
-    @logger.catch
-    def QuerySaleStartTime(self) -> tuple[int, str, int]:
-        """
-        获取开票时间
-        """
         code, msg, skuInfo = self.info.QuerySku(
             projectId=self.projectId,
+            linkId=self.linkId,
             screenId=self.screenId,
             skuId=self.skuId,
             cost=self.cost,
@@ -330,6 +313,7 @@ class Bilibili:
         """
         code, msg, skuInfo = self.info.QuerySku(
             projectId=self.projectId,
+            linkId=self.linkId,
             screenId=self.screenId,
             skuId=self.skuId,
             cost=self.cost,
@@ -387,12 +371,12 @@ class Bilibili:
         # 邮寄票
         if self.needDeliver:
             params["deliver_info"] = json.dumps(self.deliver, ensure_ascii=False)
-            params["buyer"] = self.userinfo["username"]
+            params["buyer"] = self.user["username"]
             params["tel"] = self.phone
 
         # 联系人信息
         if self.needContact:
-            params["buyer"] = self.userinfo["username"]
+            params["buyer"] = self.user["username"]
             params["tel"] = self.phone
 
         res = self.net.Response(method="post", url=url, params=params)
@@ -420,7 +404,7 @@ class Bilibili:
                     method="post",
                     url="https://show.bilibili.com/api/ticket/buyer/saveContactInfo",
                     params={
-                        "username": self.userinfo["username"],
+                        "username": self.user["username"],
                         "tel": self.phone,
                     },
                 )

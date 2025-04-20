@@ -45,7 +45,7 @@ class Info:
             106: "已取消",
         }
 
-    def QueryTicketProject(self, projectId: int) -> tuple[int, str, dict]:
+    def QueryProject(self, projectId: int) -> tuple[int, str, dict]:
         """
         项目基本信息
 
@@ -81,7 +81,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryGoodsProject(self, projectId: int) -> tuple[int, str, list[dict]]:
+    def QueryGoodsList(self, projectId: int) -> tuple[int, str, list[dict]]:
         """
         商品信息列表
         
@@ -119,7 +119,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryTicketScreen(self, projectId: int) -> tuple[int, str, list[dict]]:
+    def QueryTicketScreenList(self, projectId: int) -> tuple[int, str, list[dict]]:
         """
         场次信息列表
 
@@ -163,7 +163,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryTicketSku(self, projectId: int, screenId: int) -> tuple[int, str, list[dict]]:
+    def QueryTicketSkuList(self, projectId: int, screenId: int) -> tuple[int, str, list[dict]]:
         """
         票种信息列表
 
@@ -212,7 +212,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryGoodsScreen(self, linkId: int) -> tuple[int, str, list[dict]]:
+    def QueryGoodsScreenList(self, linkId: int) -> tuple[int, str, list[dict]]:
         """
         商品规格信息列表
         """
@@ -227,6 +227,7 @@ class Info:
         match code:
             # 成功
             case 0:
+                goods = res["data"]
                 screens = res["data"]["specs_list"]
                 if not screens:
                     raise InfoException("商品详情", "该商品暂未开放票务信息")
@@ -236,12 +237,12 @@ class Info:
                     dist.append(
                         {
                             "id": screen["id"],
-                            "name": screen["name"],
+                            "name": f"{goods['name']} - {screen['name']}",
                             "sale_start": screen["sale_start"],
                             "sale_end": screen["sale_end"],
                             "express_fee": screen["express_fee"],
                             "salenum": screen["sale_flag_number"],
-                            "saleflag": self.sale_flag_map[screen["sale_flag_number"]],
+                            "saleflag": self.saleFlagMap[screen["sale_flag_number"]],
                         }        
                     )
             case _:
@@ -249,7 +250,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryGoodsSku(self, linkId: int, specId: int) -> tuple[int, str, list[dict]]:
+    def QueryGoodsSkuList(self, linkId: int, screenId: int) -> tuple[int, str, list[dict]]:
         """
         商品票种信息列表
 
@@ -269,8 +270,8 @@ class Info:
                 goods = res["data"]
                 
                 for i in res["data"]["specs_list"]:
-                    if i["id"] == specId:
-                        spec = i
+                    if i["id"] == screenId:
+                        screen = i
                         skus = i["ticket_list"]
                         break
 
@@ -279,11 +280,11 @@ class Info:
                     dist.append(
                         {
                             "id": sku["id"],
-                            "name": f"{goods['name']} - {spec['name']} - {sku['desc']}",
+                            "name": f"{goods['name']} - {screen['name']} - {sku['desc']}",
                             "price": sku["price"],
                             "display_price": f"{(sku['price'] / 100):.2f}",
-                            "sale_start": spec["sale_start"],
-                            "sale_end": spec["sale_end"],
+                            "sale_start": screen["sale_start"],
+                            "sale_end": screen["sale_end"],
                             "clickable": sku["clickable"],
                             "salenum": sku["sale_flag_number"],
                             "saleflag": self.saleFlagMap[sku["sale_flag_number"]],
@@ -296,14 +297,18 @@ class Info:
 
         return code, msg, dist
 
-    def QueryScreen(self, projectId: int, screenId: int) -> tuple[int, str, dict]:
+    def QueryScreen(self, projectId: int, linkId: int, screenId: int) -> tuple[int, str, dict]:
         """
         场次信息
 
         projectId: 项目ID
+        linkId: 商品ID
         screenId: 场次ID
         """
-        code, msg, screens = self.QueryTicketScreen(projectId=projectId)
+        if linkId:
+            code, msg, screens = self.QueryGoodsScreenList(linkId=linkId)
+        else:
+            code, msg, screens = self.QueryTicketScreenList(projectId=projectId)
 
         for screen in screens:
             if screen["id"] == screenId:
@@ -311,16 +316,20 @@ class Info:
 
         raise InfoException("场次查询", "指定场次不存在")
 
-    def QuerySku(self, projectId: int, screenId: int, skuId: int, cost: int) -> tuple[int, str, dict]:
+    def QuerySku(self, projectId: int, linkId: int, screenId: int, skuId: int, cost: int) -> tuple[int, str, dict]:
         """
         票种信息
 
         projectId: 项目ID
+        linkId: 商品ID
         screenId: 场次ID
         skuId: 票档ID
         cost: 价格
         """
-        code, msg, skus = self.QueryTicketSku(projectId=projectId, screenId=screenId)
+        if linkId:
+            code, msg, skus = self.QueryGoodsSkuList(linkId=linkId, screenId=screenId)
+        else:
+            code, msg, skus = self.QueryTicketSkuList(projectId=projectId, screenId=screenId)
 
         for sku in skus:
             if sku["id"] == skuId and sku["price"] == cost:
@@ -331,8 +340,6 @@ class Info:
     def QueryBuyer(self) -> list:
         """
         购买人
-
-        接口: GET https://show.bilibili.com/api/ticket/buyer/list?is_default&projectId=${projectId}
         """
         url = "https://show.bilibili.com/api/ticket/buyer/list"
         res = self.net.Response(method="get", url=url)
@@ -397,7 +404,7 @@ class Info:
             )
         return dist
 
-    def QueryUserinfo(self) -> dict:
+    def QueryUser(self) -> dict:
         """
         用户信息
         """

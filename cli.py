@@ -100,6 +100,7 @@ if __name__ == "__main__":
         api = Bilibili(
             net=net,
             projectId=productConfig["projectId"],
+            linkId=productConfig["linkId"],
             screenId=productConfig["screenId"],
             skuId=productConfig["skuId"],
             saleStart=productConfig["saleStart"],
@@ -112,7 +113,7 @@ if __name__ == "__main__":
             count=len(userConfig["buyer"]),
             deliver=userConfig["deliver"],
             phone=userConfig["phone"],
-            userinfo=userConfig["userinfo"],
+            user=userConfig["user"],
         )
 
         job = Task(

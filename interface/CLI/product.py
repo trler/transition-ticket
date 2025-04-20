@@ -80,7 +80,7 @@ class ProductCli:
             活动
             
             活动：https://show.bilibili.com/platform/detail.html?id=114514
-            商品：https://mall.bilibili.com/neul-next/detailuniversal/detail.html?itemsId=12092996
+            商品：https://mall.bilibili.com/neul-next/detailuniversal/detail.html?itemsId=1919810
             """
             # print(f"{self.BLUE}[{self.YELLOW}!{self.BLUE}]{self.RESET} 近期活动: show.bilibili.com/platform/detail.html?id=114514")
             url = self.data.Inquire(
@@ -98,7 +98,7 @@ class ProductCli:
                     projectId = int(match_mall.group(1))
                     return 2, projectId
                 else:
-                    raise InfoException("商品配置初始化", "商品URL格式错误!")
+                    raise InfoException("活动配置初始化", "活动URL格式错误!")
 
             except InfoException:
                 logger.warning("请重新配置活动信息!")
@@ -113,7 +113,7 @@ class ProductCli:
             """
             try:
                 _, _, projectInfo = self.info.QueryProject(projectId=projectId)
-                _, _, goodsInfo = self.info.QueryGoods(projectId=projectId)
+                _, _, goodsInfo = self.info.QueryGoodsList(projectId=projectId)
 
                 if not goodsInfo:
                     return 0
@@ -143,11 +143,11 @@ class ProductCli:
             场次
             """
             try:
-                _, _, projectInfo = self.info.QueryTicketProject(projectId=projectId)
-                _, _, screenInfo = self.info.QueryTicketScreen(projectId=projectId)
+                _, _, projectInfo = self.info.QueryProject(projectId=projectId)
+                _, _, screenInfo = self.info.QueryTicketScreenList(projectId=projectId)
                 
                 if linkId:
-                    _, _, specInfo = self.info.QueryGoodsSpec(linkId=linkId)
+                    _, _, specInfo = self.info.QueryGoodsScreenList(linkId=linkId)
                     screenInfo = screenInfo + specInfo
 
                 lists = {
@@ -185,9 +185,9 @@ class ProductCli:
             try:
 
                 if linkId:
-                    _, _, skuInfo = self.info.QueryGoodsSku(linkId=linkId, specId=screenId)
+                    _, _, skuInfo = self.info.QueryGoodsSkuList(linkId=linkId, screenId=screenId)
                 else:
-                    _, _, skuInfo = self.info.QueryTicketSku(projectId=projectId, screenId=screenId)
+                    _, _, skuInfo = self.info.QueryTicketSkuList(projectId=projectId, screenId=screenId)
                     
                 
                 lists = {
@@ -231,13 +231,15 @@ class ProductCli:
 
         print("下面开始配置商品!")
 
-        projectId = ProjectStep()
+        # TODO: complete mall strategy by matching projectType (1: show, 2: mall)
+        _projectType, projectId = ProjectStep()
         linkId = GoodsStep(projectId=projectId)
         
         screenId, expressFee, projectName, needDeliver, needContact = ScreenStep(projectId=projectId, linkId=linkId)
         skuId, skuSelected, saleStart, cost, act = SkuStep(projectId=projectId, linkId=linkId, screenId=screenId)
 
         self.config["projectId"] = projectId
+        self.config["linkId"] = linkId
         self.config["screenId"] = screenId
         self.config["skuId"] = skuId
         self.config["saleStart"] = saleStart
