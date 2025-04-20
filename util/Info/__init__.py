@@ -227,7 +227,7 @@ class Info:
         match code:
             # 成功
             case 0:
-                goods = res["data"]
+                good = res["data"]
                 screens = res["data"]["specs_list"]
                 if not screens:
                     raise InfoException("商品详情", "该商品暂未开放票务信息")
@@ -237,8 +237,8 @@ class Info:
                     dist.append(
                         {
                             "id": screen["id"],
-                            "item_id": goods["item_id"],
-                            "name": f"{goods['name']} - {screen['name']}",
+                            "item_id": good["item_id"],
+                            "name": f"{good['name']} - {screen['name']}",
                             "sale_start": screen["sale_start"],
                             "sale_end": screen["sale_end"],
                             "express_fee": screen["express_fee"],
@@ -268,7 +268,7 @@ class Info:
         match code:
             # 成功
             case 0:
-                goods = res["data"]
+                good = res["data"]
                 
                 for i in res["data"]["specs_list"]:
                     if i["id"] == screenId:
@@ -281,7 +281,7 @@ class Info:
                     dist.append(
                         {
                             "id": sku["id"],
-                            "name": f"{goods['name']} - {screen['name']} - {sku['desc']}",
+                            "name": f"{good['name']} - {screen['name']} - {sku['desc']}",
                             "price": sku["price"],
                             "display_price": f"{(sku['price'] / 100):.2f}",
                             "sale_start": screen["sale_start"],
