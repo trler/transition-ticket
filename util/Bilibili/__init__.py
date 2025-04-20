@@ -300,7 +300,7 @@ class Bilibili:
             case _:
                 saleStart = 0
 
-        return 0, "", self.saleStart
+        return code, msg, saleStart
 
     @logger.catch
     def QueryAmount(self) -> tuple[int, str, bool, int, int]:
