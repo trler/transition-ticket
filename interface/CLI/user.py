@@ -38,6 +38,8 @@ class UserCli:
             "buyer": [],
             # 收货信息
             "deliver": {},
+            # 用户
+            "user": {},
             # 绑定手机号
             "phone": "",
         }
@@ -237,8 +239,8 @@ class UserCli:
         self.config["header"] = self.net.GetHeader()
         self.config["buyer"] = BuyerStep()
         self.config["deliver"] = DeliverStep()
-        self.config["phone"] = PhoneStep()
         self.config["user"] = self.info.QueryUser()
+        self.config["phone"] = PhoneStep()
 
         name = [i["name"] for i in self.config["buyer"]]
         self.conf.Save(
