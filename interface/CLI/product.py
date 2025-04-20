@@ -110,7 +110,7 @@ class ProductCli:
             场次
             """
             try:
-                _, _, projectInfo = self.info.QueryProject(projectId=projectId)
+                _, _, projectInfo = self.info.QueryTicketProject(projectId=projectId)
                 _, _, screenInfo = self.info.QueryTicketScreen(projectId=projectId)
 
                 lists = {

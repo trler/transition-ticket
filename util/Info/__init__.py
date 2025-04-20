@@ -45,7 +45,7 @@ class Info:
             106: "已取消",
         }
 
-    def QueryProject(self, projectId: int) -> tuple[int, str, dict]:
+    def QueryTicketProject(self, projectId: int) -> tuple[int, str, dict]:
         """
         项目基本信息
 
@@ -81,7 +81,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryGoods(self, projectId: int) -> tuple[int, str, list[dict]]:
+    def QueryGoodsProject(self, projectId: int) -> tuple[int, str, list[dict]]:
         """
         商品信息列表
         
@@ -208,7 +208,7 @@ class Info:
 
         return code, msg, dist
 
-    def QueryGoodsSpec(self, linkId: int) -> tuple[int, str, list[dict]]:
+    def QueryGoodsScreen(self, linkId: int) -> tuple[int, str, list[dict]]:
         """
         商品规格信息列表
         """
@@ -223,20 +223,20 @@ class Info:
         match code:
             # 成功
             case 0:
-                specs = res["data"]["specs_list"]
-                if not specs:
+                screens = res["data"]["specs_list"]
+                if not screens:
                     raise InfoException("商品详情", "该商品暂未开放票务信息")
 
                 dist = []
-                for spec in specs:
+                for screen in screens:
                     dist.append(
                         {
-                            "id": spec["id"],
-                            "name": spec["name"],
-                            "display_name": self.sale_flag_map[spec["sale_flag_number"]],
-                            "sale_start": spec["sale_start"],
-                            "sale_end": spec["sale_end"],
-                            "express_fee": spec["express_fee"],
+                            "id": screen["id"],
+                            "name": screen["name"],
+                            "display_name": self.sale_flag_map[screen["sale_flag_number"]],
+                            "sale_start": screen["sale_start"],
+                            "sale_end": screen["sale_end"],
+                            "express_fee": screen["express_fee"],
                         }        
                     )
             case _:
