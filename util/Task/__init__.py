@@ -564,6 +564,24 @@ class Task:
                 # 刷新
                 self.AutoSleepInterval()
 
+            # 票价错误
+            case 100034:
+                logger.warning("【创建订单】票价错误! 已自动更新票价")
+                # 刷新
+                self.AutoSleepInterval()
+
+            # 未预填联系人信息
+            case 209001:
+                logger.error("【创建订单】未预填联系人信息!")
+                # 刷新
+                self.AutoSleepInterval()
+
+            # 未预填收货信息
+            case 214:
+                logger.error("【创建订单】未预填收货信息!")
+                # 刷新
+                self.AutoSleepInterval()
+
             # 订单已存在/已购买
             case 100049:
                 logger.error("【创建订单】该项目每人限购1张, 已存在购买订单")
