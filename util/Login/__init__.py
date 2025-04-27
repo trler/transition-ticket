@@ -33,11 +33,7 @@ class Login:
     """
 
     @logger.catch
-    def __init__(
-        self,
-        net: Request,
-        checkStatus: bool = True,
-    ):
+    def __init__(self, net=Request, isCheckStatus: bool = True):
         """
         初始化
 
@@ -45,13 +41,60 @@ class Login:
         isCheckStatus: 是否检查登录状态
         """
         self.net = net
-        self.isCheckStatus = checkStatus
+        self.isCheckStatus = isCheckStatus
 
-        self.cookie = {}
         self.data = Data()
         self.cap = Captcha()
 
+        self.cookie = {}
         self.source = "main_h5"
+
+    @logger.catch
+    def __GetCaptcha(self) -> tuple:
+        """
+        获取Captcha验证码并通过Geetest验证
+
+        文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
+        """
+        res = self.net.Response(
+            method="get",
+            url="https://passport.bilibili.com/x/passport-login/captcha?source=main_web",
+        )
+
+        if res["code"] == 0:
+            token = res["data"]["token"]
+            challenge = res["data"]["geetest"]["challenge"]
+            validate = self.cap.Geetest(challenge)
+            seccode = validate + "|jordan"
+            return token, challenge, validate, seccode
+        else:
+            logger.warning("程序正在准备退出...")
+            sleep(5)
+            sys.exit()
+
+    @logger.catch
+    def __GetPreCaptcha(self) -> tuple:
+        """
+        获取PreCaptcha验证码并通过Geetest验证
+
+        文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
+        """
+        res = self.net.Response(
+            method="post",
+            url="https://passport.bilibili.com/x/safecenter/captcha/pre",
+            isJson=False,
+        )
+
+        if res["code"] == 0:
+            token = res["data"]["recaptcha_token"]
+            challenge = res["data"]["gee_challenge"]
+            validate = self.cap.Geetest(challenge)
+            seccode = validate + "|jordan"
+            return token, challenge, validate, seccode
+        else:
+            logger.warning("程序正在准备退出...")
+            sleep(5)
+            sys.exit()
 
     def QRCode(self) -> dict:
         """
@@ -132,53 +175,6 @@ class Login:
         driver.quit()
         return self.Status()
 
-    @logger.catch
-    def GetCaptcha(self) -> tuple:
-        """
-        获取Captcha验证码并通过Geetest验证
-
-        文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
-        """
-        res = self.net.Response(
-            method="get",
-            url="https://passport.bilibili.com/x/passport-login/captcha?source=main_web",
-        )
-
-        if res["code"] == 0:
-            token = res["data"]["token"]
-            challenge = res["data"]["geetest"]["challenge"]
-            validate = self.cap.Geetest(challenge)
-            seccode = validate + "|jordan"
-            return token, challenge, validate, seccode
-        else:
-            logger.warning("程序正在准备退出...")
-            sleep(5)
-            sys.exit()
-
-    @logger.catch
-    def GetPreCaptcha(self) -> tuple:
-        """
-        获取PreCaptcha验证码并通过Geetest验证
-
-        文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/readme.md
-        """
-        res = self.net.Response(
-            method="post",
-            url="https://passport.bilibili.com/x/safecenter/captcha/pre",
-            isJson=False,
-        )
-
-        if res["code"] == 0:
-            token = res["data"]["recaptcha_token"]
-            challenge = res["data"]["gee_challenge"]
-            validate = self.cap.Geetest(challenge)
-            seccode = validate + "|jordan"
-            return token, challenge, validate, seccode
-        else:
-            logger.warning("程序正在准备退出...")
-            sleep(5)
-            sys.exit()
-
     def Password(self, username: str, password: str) -> dict:
         """
         账号密码登录
@@ -188,7 +184,7 @@ class Login:
 
         文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/password.md
         """
-        token, challenge, validate, seccode = self.GetCaptcha()
+        token, challenge, validate, seccode = self.__GetCaptcha()
 
         salt = self.net.Response(
             method="get",
@@ -248,7 +244,7 @@ class Login:
             hide_tel = res_info["data"]["account_info"]["hide_tel"]
             logger.info(f"【登录】手机号已绑定, 即将给 {hide_tel} 发送验证码")
 
-            token, challenge, validate, seccode = self.GetPreCaptcha()
+            token, challenge, validate, seccode = self.__GetPreCaptcha()
 
             res_resend = self.net.Response(
                 method="post",
@@ -320,7 +316,7 @@ class Login:
 
         文档: https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/login/login_action/SMS.md
         """
-        token, challenge, validate, seccode = self.GetCaptcha()
+        token, challenge, validate, seccode = self.__GetCaptcha()
 
         params = {
             "cid": 86,
