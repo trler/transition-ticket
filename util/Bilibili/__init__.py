@@ -1,5 +1,5 @@
+import base64
 import json
-from base64 import b64encode
 from random import randint
 from time import time
 
@@ -235,8 +235,8 @@ class Bilibili:
         map_orig = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/+="
         map_real = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.."
 
-        token = bytes([192]) # Token Header
-        timestamp = int(time.time())
+        token = bytes([192])  # Token Header
+        timestamp = int(time())
         token += timestamp.to_bytes(4, byteorder="big")
         token += self.projectId.to_bytes(4, byteorder="big")
         token += self.screenId.to_bytes(4, byteorder="big")
@@ -245,7 +245,7 @@ class Bilibili:
         token += self.skuId.to_bytes(4, byteorder="big")
         token = base64.b64encode(token).decode()
         token = token.translate(str.maketrans(map_orig, map_real))
-        
+
         self.token = token
         return 0, token
 
