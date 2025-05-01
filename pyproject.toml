@@ -23,7 +23,7 @@ selenium = "^4.21.0"
 py-machineid = "^0.5.1"
 plyer = "^2.1.0"
 pyaudio = "^0.2.14"
-pytz = "^2024.1"
+pytz = "^2025.2"
 psutil = "^6.0.0"
 
 [tool.poetry.group.dev]
