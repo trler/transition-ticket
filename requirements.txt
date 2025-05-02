@@ -28,7 +28,7 @@ pillow==10.4.0
 platformdirs==4.3.7
 pluggy==1.5.0
 plyer==2.1.0
-psutil==6.1.1
+psutil==7.0.0
 py-machineid==0.7.0
 PyAudio==0.2.14
 pycparser==2.22
