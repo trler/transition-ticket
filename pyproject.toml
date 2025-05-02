@@ -24,7 +24,7 @@ py-machineid = "^0.7.0"
 plyer = "^2.1.0"
 pyaudio = "^0.2.14"
 pytz = "^2025.2"
-psutil = "^6.0.0"
+psutil = "^7.0.0"
 
 [tool.poetry.group.dev]
 optional = true

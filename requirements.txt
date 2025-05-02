@@ -1,7 +1,7 @@
 anyio==4.9.0
 attrs==25.3.0
 bili_ticket_gt_python==0.3.2
-blessed==1.20.0
+blessed==1.21.0
 certifi==2025.4.26
 cffi==1.17.1
 cfgv==3.4.0
@@ -29,14 +29,14 @@ platformdirs==4.3.7
 pluggy==1.5.0
 plyer==2.1.0
 psutil==6.1.1
-py-machineid==0.5.1
+py-machineid==0.7.0
 PyAudio==0.2.14
 pycparser==2.22
 pycryptodome==3.22.0
 pypng==0.20220715.0
 PySocks==1.7.1
 pytest==8.3.5
-pytz==2024.2
+pytz==2025.2
 PyYAML==6.0.2
 qrcode==7.4.2
 readchar==4.2.1
