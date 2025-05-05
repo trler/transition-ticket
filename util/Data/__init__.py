@@ -341,12 +341,11 @@ class Data:
             logger.warning("程序正在准备退出...")
             sleep(5)
             sys.exit()
-        
+
         if type == "Text":
-            p = re.compile(r'(?:\x1b$$[0-9;]*[mHJ]|[\r\n\x7f\x00-\x1f])')
+            p = re.compile(r"(?:\x1b$$[0-9;]*[mHJ]|[\r\n\x7f\x00-\x1f])")
             result = p.sub("", res["res"])
         else:
             result = res["res"]
 
         return result
-        
