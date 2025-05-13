@@ -344,8 +344,8 @@ class Bilibili:
             params["tel"] = self.phone
 
         # 场贩
-        if self.link_id:
-            params["link_id"] = self.link_id
+        if self.linkId:
+            params["link_id"] = self.linkId
 
         res = self.net.Response(method="post", url=url, params=params)
         code = res["errno"]
