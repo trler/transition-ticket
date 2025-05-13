@@ -38,7 +38,7 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install virtualenv
 
 virtualenv venv
-source venv/script/activate
+source venv/bin/active
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install -r requirements.txt
 python cli.py
@@ -57,7 +57,7 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install poetry virtualenv
 
 virtualenv venv
-source venv/script/activate
+source venv/bin/active
 poetry install --with dev,graph
 pre-commit install
 
