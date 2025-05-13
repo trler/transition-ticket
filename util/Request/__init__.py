@@ -113,8 +113,8 @@ class Request:
             if dist.status_code == 200:
                 if "application/json" in dict(dist.headers)["content-type"]:
                     res = dist.json()
-                    code = res.get("code") if res.get("code") is not None else res.get("errno")
-                    msg = res.get("msg") if res.get("msg") is not None else res.get("message") 
+                    code = res.get("errno") if res.get("errno") is not None else res.get("code")
+                    msg = res.get("msg") if res.get("msg") is not None else res.get("message")
                     return {
                         "code": code,
                         "errno": code,
