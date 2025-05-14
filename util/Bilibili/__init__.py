@@ -261,8 +261,8 @@ class Bilibili:
         )
 
         interval = self.info.QueryTimestamp() - int(time())
-        saleStart = saleStart + interval
-        logger.info(f"【开票时间】已校准时间差为: {interval}秒")
+        saleStart = saleStart - interval
+        logger.info(f"【开票时间】已校准时间差为: {interval} 秒")
 
         return 0, "", saleStart
 
