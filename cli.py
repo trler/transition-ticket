@@ -102,6 +102,7 @@ if __name__ == "__main__":
             saleStart=productConfig["saleStart"],
             cost=productConfig["cost"],
             deliverFee=productConfig["deliverFee"],
+            package=productConfig["package"],
             act=productConfig["act"],
             needDeliver=productConfig["needDeliver"],
             needContact=productConfig["needContact"],

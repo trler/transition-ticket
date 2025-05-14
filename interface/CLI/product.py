@@ -174,7 +174,7 @@ class ProductCli:
                 sys.exit()
 
         @logger.catch
-        def SkuStep(projectId: int, linkId: int, screenId: int) -> tuple[int, str, int, int, dict]:
+        def SkuStep(projectId: int, linkId: int, screenId: int) -> tuple[int, str, int, int, dict, dict]:
             """
             价位
 
@@ -205,6 +205,7 @@ class ProductCli:
                     lists[select]["name"] + " " + lists[select]["display_price"],
                     lists[select]["sale_start"],
                     lists[select]["price"],
+                    lists[select]["package"],
                     lists[select]["act"],
                 )
                 return dist
@@ -235,7 +236,7 @@ class ProductCli:
             projectId=_projectId,
         )
 
-        skuId, skuName, saleStart, cost, act = SkuStep(
+        skuId, skuName, saleStart, cost, package, act = SkuStep(
             projectId=projectId,
             linkId=linkId,
             screenId=screenId,
@@ -248,6 +249,7 @@ class ProductCli:
         self.config["saleStart"] = saleStart
         self.config["cost"] = cost
         self.config["deliverFee"] = max(expressFee, 0)
+        self.config["package"] = package
         self.config["act"] = act
         self.config["needDeliver"] = needDeliver
         self.config["needContact"] = needContact

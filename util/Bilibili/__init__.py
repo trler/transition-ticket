@@ -28,6 +28,7 @@ class Bilibili:
         deliverFee: int,
         needDeliver: bool,
         needContact: bool,
+        package: dict,
         act: dict,
         buyer: dict,
         deliver: dict,
@@ -49,6 +50,7 @@ class Bilibili:
         deliverFee: 运费
         needDeliver: 是否需要填写收货信息
         needContact: 是否需要填写联系人信息
+        package: 包裹信息
         act: 优惠信息
         buyer: 购买者信息
         deliver: 收货信息
@@ -60,7 +62,10 @@ class Bilibili:
         self.info = Info(net=net)
 
         self.scene = "neul-next"
+        self.version = "1.1.0"
+        self.coupon = ""
 
+        # Order Params
         self.projectId = projectId
         self.linkId = linkId
         self.screenId = screenId
@@ -74,6 +79,7 @@ class Bilibili:
 
         self.needDeliver = needDeliver
         self.needContact = needContact
+        self.package = package
         self.act = act
         self.buyer = buyer
         self.phone = phone
@@ -86,6 +92,7 @@ class Bilibili:
         self.token = ""
         self.risked = False
 
+        # Risk Param
         self.buvid = ""
         self.decisionType = ""
         self.ip = ""
@@ -321,7 +328,12 @@ class Bilibili:
             "deviceId": self.net.GetCookie()["deviceFingerprint"],
             "clickPosition": clickPosition,
             "requestSource": self.scene,
+            "is_package": self.package["is_package"],
+            "package_num": self.package["package_num"],
+            "coupon_code": self.coupon,
+            "version": self.version,
             "again": 1,
+            "newRisk": True,
         }
 
         # 优惠票

@@ -229,6 +229,10 @@ class Info:
                             "salenum": sku["sale_flag_number"],
                             "saleflag": sku["sale_flag"]["display_name"],
                             "num": sku["num"],
+                            "package": {
+                                "is_package": sku["is_package"],
+                                "package_num": sku["package_num"],
+                            },
                             "act": {
                                 "act_id": sku["discount_act"]["act_id"],
                                 "act_type": sku["discount_act"]["act_type"],
@@ -321,6 +325,10 @@ class Info:
                             "salenum": sku["sale_flag_number"],
                             "saleflag": self.saleFlagMap[sku["sale_flag_number"]],
                             "num": sku["num"],
+                            "package": {
+                                "is_package": sku["is_package"],
+                                "package_num": sku["package_num"],
+                            },
                             "act": {},
                         }
                     )
