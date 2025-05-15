@@ -49,7 +49,7 @@ class Task:
         self.data = Data()
 
         # 重试创建订单间隔
-        self.refreshInterval = 2.1
+        self.refreshInterval = 0.5
         # 上次重试创建订单时间
         self.refreshTime = 0
 
