@@ -44,6 +44,7 @@ class Task:
         self.api = api
 
         self.notice = notice
+        self.sleep = sleep
 
         self.data = Data()
 
