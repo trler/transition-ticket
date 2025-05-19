@@ -14,7 +14,7 @@ httpx = {extras = ["http2", "socks"], version = "^0.28.1"}
 fake-useragent = "^2.2.0"
 loguru = "^0.7.2"
 bili-ticket-gt-python = "^0.3.1"
-pycryptodome = "^3.20.0"
+pycryptodome = "^3.23.0"
 pyyaml = "^6.0.1"
 inquirer = "^3.2.4"
 qrcode = "^8.2"
