@@ -32,7 +32,7 @@ psutil==7.0.0
 py-machineid==0.7.0
 PyAudio==0.2.14
 pycparser==2.22
-pycryptodome==3.22.0
+pycryptodome==3.23.0
 PySocks==1.7.1
 pytest==8.3.5
 pytz==2025.2
