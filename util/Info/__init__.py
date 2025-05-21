@@ -498,9 +498,16 @@ class Info:
         时间戳
         """
         url = "https://show.bilibili.com/api/activity/index/home/timestamp"
-        res = self.net.Response(method="get", url=url)
+        prev = 0
 
-        dist = res["data"]
+        while True:
+            res = self.net.Response(method="get", url=url)
+
+            if prev != 0 and prev != res["data"]:
+                dist = res["data"]
+                break
+
+            prev = res["data"]
 
         return dist
 
