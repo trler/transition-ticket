@@ -1,5 +1,7 @@
 # Transition Ticket
 
+> 本仓库即将停止更新并迁移到[Transition-Ticket-NG](https://github.com/biliticket/Transition-Ticket-NG/)!
+
 ## 声明
 
 [电报交流群](https://t.me/bilibili_ticket)

@@ -27,6 +27,7 @@ if __name__ == "__main__":
 |=====================================================================
 |
 |  欢迎使用 github.com/biliticket/transition-ticket
+|  本仓库即将停止更新并迁移到 https://github.com/biliticket/Transition-Ticket-NG
 |  TG交流群 t.me/bilibili_ticket
 |  本程序仅供学习交流, 不得用于商业用途
 |  使用本程序进行违法操作产生的法律责任由操作者自行承担
