@@ -29,7 +29,7 @@ platformdirs==4.3.8
 pluggy==1.6.0
 plyer==2.1.0
 psutil==7.0.0
-py-machineid==0.7.0
+py-machineid==0.8.0
 PyAudio==0.2.14
 pycparser==2.22
 pycryptodome==3.23.0
