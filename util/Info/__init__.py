@@ -84,7 +84,7 @@ class Info:
                     "name": res["data"]["name"],
                     "time": res["data"]["performance_desc"]["list"][base]["details"][0]["content"],
                     "need_deliver": res["data"]["has_paper_ticket"],
-                    "need_contact": not res["data"]["need_contact"],
+                    "need_contact": res["data"]["need_contact"],
                     "id_bind": res["data"]["id_bind"],
                 }
             case _:
