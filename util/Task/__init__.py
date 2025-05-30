@@ -348,13 +348,13 @@ class Task:
             case _:
                 logger.error(f"【获取开票时间】获取失败! {msg}")
 
-        countdown = start_time - int(time())
+        countdown = start_time - time()
 
         if countdown > 0:
             self.countdownCode = 1
 
             while countdown > 0:
-                countdown = start_time - int(time())
+                countdown = start_time - time()
 
                 if 600 >= countdown > 60:
                     logger.info(f"【等待开票】准备开票! 需要等待 {countdown / 60:.1f} 分钟")
@@ -362,19 +362,16 @@ class Task:
                     countdown -= 5
 
                 elif 60 >= countdown > 1:
-                    logger.info(f"【等待开票】即将开票! 需要等待 {countdown - 1} 秒")
+                    logger.info(f"【等待开票】即将开票! 需要等待 {countdown - 1:.0f} 秒")
                     sleep(1)
                     countdown -= 1
 
                 elif countdown < 1:
-                    logger.info("【等待开票】即将开票!")
+                    logger.info(f"【等待开票】即将开票! {countdown}")
                     sleep(countdown)
+                    countdown = 0
 
-        if countdown == 0:
-            logger.info("【等待开票】等待结束! 开始抢票")
-            self.countdownCode = 0
-
-        if countdown < 0:
+        if countdown <= 0:
             logger.info("【等待开票】已开票! 开始进入抢票模式")
             self.countdownCode = 0
 
