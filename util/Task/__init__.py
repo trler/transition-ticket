@@ -367,7 +367,7 @@ class Task:
                     countdown -= 1
 
                 elif countdown < 1:
-                    logger.info(f"【等待开票】即将开票! {countdown}")
+                    logger.info(f"【等待开票】即将开票!")
                     sleep(countdown)
                     countdown = 0
 
