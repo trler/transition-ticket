@@ -690,12 +690,10 @@ class Task:
         """
         # 票仓有票
         if self.data.TimestampCheck(timestamp=self.availableTime):
-            logger.debug(self.sleep)
             sleep(self.sleep)
 
         # 票仓无票
         else:
-            logger.debug(self.sleep / 1.5)
             sleep(self.sleep / 1.5)
 
     @logger.catch
