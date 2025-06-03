@@ -543,21 +543,21 @@ class Task:
             case x if 100050 <= x <= 100059:
                 logger.warning("【创建订单】Token过期! 即将重新获取")
 
-            # 库存不足 219,100009
-            case 219 | 100009:
+            # 库存不足 219,221
+            case 219 | 221:
+                logger.warning("【创建订单】库存暂时不足!")
+                # 刷新
+                self.AutoSleepInterval()
+
+            # 库存不足 100009
+            case 100009:
                 logger.warning("【创建订单】库存不足!")
                 # 刷新
                 self.AutoSleepInterval()
 
             # 请慢一点
-            case 100001:
-                logger.warning("【创建订单】100001! 服务器卡卡卡咔咔咔咔卡卡卡")
-                # 刷新
-                self.AutoSleepInterval()
-
-            # 硬控
-            case 3:
-                logger.warning("【创建订单】ERR 3! 服务器卡卡卡咔咔咔咔卡卡卡")
+            case 100001 | 3:
+                logger.warning("【创建订单】服务器卡卡卡咔咔咔咔卡卡卡")
                 # 刷新
                 self.AutoSleepInterval()
 
@@ -615,13 +615,15 @@ class Task:
             # 失败
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】429! 服务器卡卡卡咔咔咔咔卡卡卡")
+                    logger.warning("【创建订单】网络卡卡卡咔咔咔咔卡卡卡")
                     self.createOrderCode = 429
+                    # 刷新
+                    self.AutoSleepInterval()
+
                 else:
                     logger.error(f"【创建订单】{self.createOrderCode}: {msg}")
-
-                # 刷新
-                self.AutoSleepInterval()
+                    # 刷新
+                    self.AutoSleepInterval()
 
     @logger.catch
     def CreateStatusAction(self) -> None:
