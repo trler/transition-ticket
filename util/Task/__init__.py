@@ -541,8 +541,6 @@ class Task:
             # 请慢一点
             case 100001 | 3:
                 logger.warning("【创建订单】服务器卡卡卡咔咔咔咔卡卡卡")
-                # 刷新
-                self.AutoSleepInterval()
 
             # 票价错误
             case 100034:
@@ -600,8 +598,6 @@ class Task:
                 if msg == "请求错误: 429":
                     logger.warning("【创建订单】网络卡卡卡咔咔咔咔卡卡卡")
                     self.createOrderCode = 429
-                    # 刷新
-                    self.AutoSleepInterval()
 
                 else:
                     logger.error(f"【创建订单】{self.createOrderCode}: {msg}")
