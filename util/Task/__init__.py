@@ -52,22 +52,8 @@ class Task:
         self.refreshInterval = 0.5
         # 上次重试创建订单时间
         self.refreshTime = 0
-
         # 上次有票时间
         self.availableTime = 0
-        # 有票期内间隔
-        self.availableSchedule = [
-            # 0-0
-            [0, 0.0],
-            # 0-1.25
-            [1.25, self.sleep / 1.5],
-            # 1.25-5
-            [5.0, self.sleep],
-            # 5-8
-            [8, self.sleep * 2.0],
-            # 8-10.5
-            [10.5, self.sleep / 1.5],
-        ]
 
         # Code
         self.countdownCode = 114514
@@ -252,10 +238,7 @@ class Task:
             # 失败重试
             conditions=lambda: self.createOrderCode in [429, 100001, 209001]
             # 冲刺模式
-            or self.data.TimestampCheck(
-                timestamp=self.availableTime,
-                duration=self.availableSchedule[-1][0],
-            ),
+            or self.data.TimestampCheck(timestamp=self.availableTime),
         )
         self.machine.add_transition(
             trigger="CreateOrder",
@@ -516,13 +499,13 @@ class Task:
                     logger.info("【等待余票】暂时无票, 持续查询票仓中...")
                     self.availableTime = 0
                     # 刷新
-                    sleep(self.sleep / 1.5)
+                    self.AutoSleepInterval()
 
             # 不知道
             case _:
                 logger.error(f"【等待余票】{code}: {msg}")
                 # 刷新
-                sleep(self.sleep / 1.5)
+                self.AutoSleepInterval()
 
     @logger.catch
     def CreateOrderAction(self) -> None:
@@ -705,26 +688,15 @@ class Task:
         """
         自动Sleep策略
         """
-        # 票仓有票时
-        if self.data.TimestampCheck(
-            timestamp=self.availableTime,
-            duration=self.availableSchedule[-1][0],
-        ):
-            for i in range(len(self.availableSchedule) - 1):
-                start = self.availableSchedule[i][0]
-                end = self.availableSchedule[i + 1][0]
-                # 超过start, 未满足end
-                if not self.data.TimestampCheck(timestamp=self.availableTime, duration=start):
-                    if self.data.TimestampCheck(timestamp=self.availableTime, duration=end):
-                        sleepTime = self.availableSchedule[i + 1][1]
-                        break
-
-            logger.info(f"【创建订单】出票期, 请求间隔将自动调整至{sleepTime:.2f}秒")
-            sleep(sleepTime)
-
-        # 常规试探
-        else:
+        # 票仓有票
+        if self.data.TimestampCheck(timestamp=self.availableTime):
+            logger.debug(self.sleep)
             sleep(self.sleep)
+
+        # 票仓无票
+        else:
+            logger.debug(self.sleep / 1.5)
+            sleep(self.sleep / 1.5)
 
     @logger.catch
     def DrawFSM(self) -> None:

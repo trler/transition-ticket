@@ -167,7 +167,7 @@ class Data:
                     return ""
 
     @staticmethod
-    def TimestampCheck(timestamp: int, duration: float = 15.0) -> bool:
+    def TimestampCheck(timestamp: int, duration: float = 12.0) -> bool:
         """
         时间戳有效性检查
 
