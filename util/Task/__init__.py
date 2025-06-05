@@ -530,7 +530,7 @@ class Task:
             case 219 | 221:
                 logger.warning("【创建订单】库存暂时不足!")
                 # 刷新
-                self.AutoSleepInterval()
+                self.AutoSleepInterval(option=3)
 
             # 库存不足 100009
             case 100009:
@@ -680,17 +680,23 @@ class Task:
             t.start()
 
     @logger.catch
-    def AutoSleepInterval(self) -> None:
+    def AutoSleepInterval(self, option=1) -> None:
         """
         自动Sleep策略
         """
         # 票仓有票
         if self.data.TimestampCheck(timestamp=self.availableTime):
-            sleep(self.sleep)
+            match option:
+                # 1s 盾
+                case 1:
+                    sleep(0.95)
+                # 3s 盾
+                case 3:
+                    sleep(2.95)
 
         # 票仓无票
         else:
-            sleep(self.sleep / 1.5)
+            sleep(self.sleep)
 
     @logger.catch
     def DrawFSM(self) -> None:
