@@ -52,7 +52,7 @@ python cli.py
 
 ## 开发
 
-- Python >= 3.10 , < 3.14
+- Python >= 3.11 , < 3.14
 
 ```bash
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
