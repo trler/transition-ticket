@@ -1,6 +1,6 @@
 # Transition Ticket
 
-> 本仓库即将停止更新并迁移到[Transition-Ticket-NG](https://github.com/biliticket/Transition-Ticket-NG/)!
+> BW不可用！！！小心被系统退票！！！为了狗命我们将停止更新
 
 ## 声明
 
