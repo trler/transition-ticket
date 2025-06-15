@@ -236,7 +236,7 @@ class Task:
             source="创建订单",
             dest="创建订单",
             # 失败重试
-            conditions=lambda: self.createOrderCode in [429, 100001, 209001]
+            conditions=lambda: self.createOrderCode in [429, 100001, 209001, 900001]
             # 冲刺模式
             or self.data.TimestampCheck(timestamp=self.availableTime),
         )
