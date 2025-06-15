@@ -86,6 +86,7 @@ class Info:
                     "need_deliver": res["data"]["has_paper_ticket"],
                     "need_contact": res["data"]["need_contact"],
                     "id_bind": res["data"]["id_bind"],
+                    "hotProject": res["data"]["hotProject"],
                 }
             case _:
                 dist = {}

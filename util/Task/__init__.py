@@ -364,6 +364,14 @@ class Task:
         预处理
         """
         logger.info("【预处理】正在预处理信息...")
+
+        _, _, projectInfo = self.api.info.QueryProject(projectId=self.api.projectId)
+        if projectInfo["hotProject"]:
+            logger.warning(f"【提示】该项目带有 hotProject 标签，跳过生成 token")
+            self.api.isHot = True
+            self.skipTokenCode = -1
+            return
+
         self.generateTokenCode, msg = self.api.GenerateToken()
         match self.generateTokenCode:
             # 成功

@@ -1,5 +1,6 @@
 import base64
 import json
+import struct
 from random import randint
 from time import time
 
@@ -79,6 +80,7 @@ class Bilibili:
 
         self.payment = self.count * self.cost + self.deliverFee
 
+        self.isHot = False
         self.needDeliver = needDeliver
         self.needContact = needContact
         self.bind = bind
@@ -93,7 +95,10 @@ class Bilibili:
         self.orderId = 0
         self.orderToken = ""
         self.token = ""
+        self.ptoken = ""
         self.risked = False
+        self.prepareTime = 0
+        self.ctoken = ""
 
         # Risk Param
         self.buvid = ""
@@ -221,7 +226,11 @@ class Bilibili:
         match code:
             # 成功
             case 0:
+                self.prepareTime = int(time() * 1000)
                 self.token = res["data"]["token"]
+                if self.isHot:
+                    self.ptoken = res["data"]["ptoken"]
+
             # 验证
             case -401:
                 riskParams = res["data"]["ga_data"]["riskParams"]
@@ -339,6 +348,11 @@ class Bilibili:
             "again": 1,
             "newRisk": True,
         }
+        if self.isHot:
+            params["ptoken"] = self.ptoken
+            params["ctoken"] = self.EncodeCtoken()
+
+        print(params)
 
         # 优惠票
         if self.act:
@@ -430,3 +444,47 @@ class Bilibili:
         msg = res["msg"]
 
         return code, msg
+
+    @logger.catch
+    def EncodeCtoken(self) -> str:
+        current_time_ms = int(time() * 1000)
+        calculatedTime = (current_time_ms - self.prepareTime) / 1000
+        secFromPrepare = int(calculatedTime)
+        if secFromPrepare <= 0:
+            secFromPrepare = 1
+
+        scrollX = 0
+        scrollY = 0
+        innerWidth = 1800
+        innerHeight = 1038
+        outerWidth = 1800
+        outerHeight = 1125
+        screenX = 0
+        screenY = 44
+        screenWidth = 1800
+
+        data = bytearray(16)
+        data[0] = 0
+        data[1] = min(scrollX, 255)
+        data[2] = 0
+        data[3] = min(scrollY, 255)
+        data[4] = min(innerWidth, 255)
+        data[5] = 1
+        data[6] = min(innerHeight, 255)
+        data[7] = min(outerWidth, 255)
+        struct.pack_into('>H', data, 8, min(secFromPrepare, 65535))
+        struct.pack_into('>H', data, 10, min(int(calculatedTime), 65535))
+        data[12] = min(outerHeight, 255)
+        data[13] = min(screenX, 255)
+        data[14] = min(screenY, 255)
+        data[15] = min(screenWidth, 255)
+
+        char_string = ''.join(chr(b) for b in data)
+        uint16_array = []
+        for char in char_string:
+            uint16_array.append(ord(char))
+        uint8_array = bytearray()
+        for value in uint16_array:
+            uint8_array.extend(struct.pack('<H', value))
+
+        return base64.b64encode(uint8_array).decode('ascii')
