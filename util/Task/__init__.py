@@ -1,7 +1,6 @@
 import logging
 import sys
 import threading
-import webbrowser
 from time import sleep, time
 
 from loguru import logger
@@ -698,7 +697,7 @@ class Task:
             message=f"下单成功! 请在十分钟内支付, 链接:{url}",
         )
         logger.success(f"【完成】下单成功! 请在十分钟内支付, 链接:{url}")
-        webbrowser.open(url)
+        # webbrowser.open(url)
 
         # 通知
         noticeThread = []
@@ -707,7 +706,7 @@ class Task:
         t4 = threading.Thread(target=notice.Ding, args=(self.notice["dingding"],))
         t5 = threading.Thread(target=notice.WX, args=(self.notice["wx"],))
         t6 = threading.Thread(target=notice.FTQQ, args=(self.notice["ftqq"],))
-        t7 = threading.Thread(target=notice.Bark, args=(self.notice["bark"],self.notice["bark_plus"]))
+        t7 = threading.Thread(target=notice.Bark, args=(self.notice["bark"], self.notice["bark_plus"]))
         t8 = threading.Thread(target=notice.Mail, args=(self.notice["smtp"],))
 
         if self.notice["system"]:
