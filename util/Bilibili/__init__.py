@@ -250,6 +250,28 @@ class Bilibili:
         return code, msg
 
     @logger.catch
+    def ConfirmInfo(self) -> tuple[int, str]:
+        """
+        确认信息
+        """
+        url = "https://show.bilibili.com/api/ticket/order/confirmInfo"
+        params = {
+            "token": self.token,
+            "voucher": self.voucher,
+            "projectId": self.projectId,
+            "project_id": self.projectId,
+            "requestSource": self.scene
+        }
+        if self.isHot:
+            params["ptoken"] = self.ptoken
+
+        res = self.net.Response(method="get", url=url, params=params)
+        code = res["errno"]
+        msg = res["msg"]
+
+        return code, msg
+
+    @logger.catch
     def GenerateToken(self) -> tuple[int, str]:
         """
         生成Token

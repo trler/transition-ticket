@@ -59,6 +59,7 @@ class Task:
         self.countdownCode = 114514
         self.skipTokenCode = 114514
         self.queryTokenCode = 114514
+        self.confirmInfoCode = 114514
         self.generateTokenCode = 114514
         self.riskProcessCode = 114514
         self.queryTicketCode = False
@@ -73,6 +74,7 @@ class Task:
             State(name="开始抢票", on_enter="StartPerformAction"),
             State(name="获取Token", on_enter="QueryTokenAction"),
             State(name="验证码", on_enter="RiskProcessAction"),
+            State(name="确认信息", on_enter="ConfirmInfoAction"),
             State(name="等待余票", on_enter="QueryTicketAction"),
             State(name="创建订单", on_enter="CreateOrderAction"),
             State(name="创建订单状态", on_enter="CreateStatusAction"),
@@ -143,7 +145,7 @@ class Task:
         self.machine.add_transition(
             trigger="StartPerform",
             source="开始抢票",
-            dest="创建订单",
+            dest="确认信息",
             # 已跳过
             conditions=lambda: self.skipTokenCode == 0,
         )
@@ -152,7 +154,7 @@ class Task:
         self.machine.add_transition(
             trigger="QueryToken",
             source="获取Token",
-            dest="创建订单",
+            dest="确认信息",
             # 获取成功
             conditions=lambda: self.queryTokenCode == 0,
         )
@@ -169,6 +171,13 @@ class Task:
             dest="获取Token",
             # 获取失败
             conditions=lambda: self.queryTokenCode not in [0, -401],
+        )
+
+        self.machine.add_transition(
+            trigger="ConfirmInfo",
+            source="确认信息",
+            dest="创建订单",
+            conditions=lambda: self.confirmInfoCode == 0,
         )
 
         # 验证码结束
@@ -194,9 +203,9 @@ class Task:
             dest="创建订单",
             # 有票
             conditions=lambda: self.queryTicketCode
-            # 超过定时刷新时间 && 未跳过
-            or self.skipTokenCode == -1
-            and not self.data.TimestampCheck(
+                               # 超过定时刷新时间 && 未跳过
+                               or self.skipTokenCode == -1
+                               and not self.data.TimestampCheck(
                 timestamp=self.refreshTime,
                 duration=self.refreshInterval,
             ),
@@ -428,6 +437,19 @@ class Task:
                     self.queryTokenCode = 429
                 else:
                     logger.error(f"【获取Token】{self.queryTokenCode}: {msg}")
+
+    @logger.catch
+    def ConfirmInfoAction(self) -> None:
+        """
+        确认订单信息
+        """
+        logger.info("【确认信息】正在确认信息...")
+        self.confirmInfoCode, msg = self.api.ConfirmInfo()
+        match self.confirmInfoCode:
+            case 0:
+                logger.info("【确认信息】确认信息成功")
+            case _:
+                logger.error(f"【确认信息】未知错误码 {self.confirmInfoCode}: {msg}")
 
     @logger.catch
     def RiskProcessAction(self) -> None:
@@ -748,6 +770,7 @@ class Task:
             "等待开票": "WaitAvailable",
             "开始抢票": "StartPerform",
             "获取Token": "QueryToken",
+            "确认信息": "ConfirmInfo",
             "验证码": "RiskProcess",
             "等待余票": "QueryTicket",
             "创建订单": "CreateOrder",
