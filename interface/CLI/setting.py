@@ -54,6 +54,7 @@ class SettingCli:
                 "ftqq": "",
                 # bark
                 "bark": "",
+                "bark_plus": True,
                 # smtp
                 "smtp": {
                     "smtp_mail_host": "",
