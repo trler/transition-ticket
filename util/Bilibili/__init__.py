@@ -352,8 +352,6 @@ class Bilibili:
             params["ptoken"] = self.ptoken
             params["ctoken"] = self.EncodeCtoken()
 
-        print(params)
-
         # 优惠票
         if self.act:
             params["act_id"] = self.act["act_id"]

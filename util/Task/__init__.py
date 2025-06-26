@@ -236,9 +236,9 @@ class Task:
             source="创建订单",
             dest="创建订单",
             # 失败重试
-            conditions=lambda: self.createOrderCode in [429, 100001, 209001, 900001]
-            # 冲刺模式
-            or self.data.TimestampCheck(timestamp=self.availableTime),
+            conditions=lambda: self.createOrderCode in [429, 3, 100001, 209001, 900001, 900002, 900003]
+                               # 冲刺模式
+                               or self.data.TimestampCheck(timestamp=self.availableTime),
         )
         self.machine.add_transition(
             trigger="CreateOrder",
@@ -246,13 +246,13 @@ class Task:
             dest="等待余票",
             # 非预定情况
             conditions=lambda: self.createOrderCode
-            not in [
-                0,
-                100079,
-                429,
-                100001,
-                *range(100050, 100060),
-            ],
+                               not in [
+                                   0,
+                                   100079,
+                                   429,
+                                   100001,
+                                   *range(100050, 100060),
+                               ],
         )
 
         # 创建订单状态结束
@@ -500,7 +500,8 @@ class Task:
                             logger.info("【等待余票】暂时售罄, 等待放票!")
 
                         case _:
-                            logger.warning(f"【等待余票】可点击状态{clickable} 状态{salenum} 数量{num}, 可下单状态{self.queryTicketCode}")
+                            logger.warning(
+                                f"【等待余票】可点击状态{clickable} 状态{salenum} 数量{num}, 可下单状态{self.queryTicketCode}")
 
                 # 不可购
                 else:
@@ -532,52 +533,56 @@ class Task:
 
             # Token过期
             case x if 100050 <= x <= 100059:
-                logger.warning("【创建订单】Token过期! 即将重新获取")
+                logger.warning(f"【创建订单】Token过期! 即将重新获取({self.createOrderCode})")
 
             # 库存不足 219,221
             case 219 | 221:
-                logger.warning("【创建订单】库存暂时不足!")
+                logger.warning(f"【创建订单】库存暂时不足! ({self.createOrderCode})")
                 # 刷新
                 self.AutoSleepInterval(option=3)
 
             # 库存不足 100009
             case 100009:
-                logger.warning("【创建订单】库存不足!")
+                logger.warning("【创建订单】库存不足! (100009)")
                 # 刷新
                 self.AutoSleepInterval()
 
             # 请慢一点
-            case 100001 | 3:
-                logger.warning("【创建订单】服务器卡卡卡咔咔咔咔卡卡卡")
+            case 100001:
+                logger.error("【创建订单】登录态不完整 (100001)")
+
+            case 3:
+                logger.error("【创建订单】身份证盾中，请稍后重试 (3)")
+                self.AutoSleepInterval(option=5)
 
             # 票价错误
             case 100034:
-                logger.warning("【创建订单】票价错误! 已自动更新票价")
+                logger.warning("【创建订单】票价错误! 已自动更新票价 (100034)")
                 # 刷新
                 self.AutoSleepInterval()
 
             # 未预填联系人信息
             case 209001:
-                logger.error("【创建订单】未预填联系人信息!")
+                logger.error("【创建订单】未预填联系人信息! (209001)")
                 # 刷新
                 self.AutoSleepInterval()
 
             # 未预填收货信息
             case 214:
-                logger.error("【创建订单】未预填收货信息!")
+                logger.error("【创建订单】未预填收货信息! (214)")
                 # 刷新
                 self.AutoSleepInterval()
 
             # 订单已存在/已购买
             case 100049:
-                logger.error("【创建订单】该项目每人限购1张, 已存在购买订单")
+                logger.error("【创建订单】该项目每人限购1张, 已存在购买订单 (100049)")
                 logger.warning("程序正在准备退出...")
                 sleep(5)
                 sys.exit()
 
             # 存在未付款订单/有尚未完成订单
             case 100079 | 100048:
-                logger.warning("【创建订单】存在冲突订单! 请先支付或取消这一单")
+                logger.warning(f"【创建订单】存在冲突订单! 请先支付或取消这一单 ({self.createOrderCode})")
                 self.AutoSleepInterval()
 
             # 超过购买数量
@@ -589,7 +594,13 @@ class Task:
 
             # 项目/票种不可售 等待开票
             case 100016 | 100017:
-                logger.error("【创建订单】该项目/票种目前不可售!")
+                logger.error(f"【创建订单】该项目/票种目前不可售! ({self.createOrderCode})")
+                logger.warning("程序正在准备退出...")
+                sleep(5)
+                sys.exit()
+
+            case 100041:
+                logger.error("【创建订单】提前下单! (100041)")
                 logger.warning("程序正在准备退出...")
                 sleep(5)
                 sys.exit()
@@ -601,14 +612,23 @@ class Task:
                 sleep(5)
                 sys.exit()
 
+            case 429:
+                logger.warning("【创建订单】b站限速, 延迟50ms请求 (429)")
+                sleep(0.05)
+
+            case 900001:
+                logger.warning("【创建订单】订单校验盾 (900001)")
+                self.AutoSleepInterval(option=1)
+
             # 失败
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】网络卡卡卡咔咔咔咔卡卡卡")
+                    logger.warning("【创建订单】b站限速, 延迟50ms请求 (429)")
                     self.createOrderCode = 429
+                    sleep(0.05)
 
                 else:
-                    logger.error(f"【创建订单】{self.createOrderCode}: {msg}")
+                    logger.error(f"【创建订单】未知错误码 {self.createOrderCode}: {msg}")
                     # 刷新
                     self.AutoSleepInterval()
 
@@ -701,6 +721,9 @@ class Task:
                 # 3s 盾
                 case 3:
                     sleep(2.95)
+                # 5s 盾
+                case 5:
+                    sleep(4.96)
 
         # 票仓无票
         else:
