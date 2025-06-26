@@ -1,6 +1,7 @@
 # Transition Ticket
 
-> BW不可用！！！小心被系统退票！！！为了狗命我们将停止更新
+> 这是一个为了 BW/BML 2025 而进行了 **小幅度** 修改的 [transition-ticket](https://github.com/biliticket/transition-ticket-archived)
+> fork, 考虑到今年的新风控策略, 本脚本较于其他脚本不具备任何优势, 如果你利用此脚本牟利, 或将其用于任何收费代抢等黄牛行为, 祝你全家螺旋升天。
 
 ## 声明
 
