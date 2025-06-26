@@ -145,6 +145,7 @@ class SettingCli:
                 "ftqq": "",
                 # bark
                 "bark": "",
+                "bark_plus": True,
                 # smtp
                 "smtp": {
                     "mail_host": "",
@@ -189,6 +190,16 @@ class SettingCli:
                     default="",
                 )
                 dist["bark"] = token
+                token = self.data.Inquire(
+                    type="Text",
+                    message="是否开启bark疯狗模式? (y/n)",
+                    default="y",
+                )
+                if token == "y":
+                    print("已开启bark疯狗模式")
+                    dist["bark_plus"] = True
+                else:
+                    dist["bark_plus"] = False
 
             if "dingding" in select:
                 token = self.data.Inquire(

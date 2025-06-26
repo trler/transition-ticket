@@ -140,7 +140,7 @@ class Notice:
         self.net.Response(method="post", url=url, params=data)
 
     @logger.catch
-    def Bark(self, token: str) -> None:
+    def Bark(self, token: str, isPlus: bool) -> None:
         """
         Bark
         """
@@ -148,18 +148,19 @@ class Notice:
         data = {
             "title": self.title,
             "body": self.message,
-            "level": "critical",
-            "volume": 10,
-            "sound": "minuet",
+            "level": "timeSensitive",
             # 推送中断级别。
             # active：默认值，系统会立即亮屏显示通知
             # timeSensitive：时效性通知，可在专注状态下显示通知。
             # passive：仅将通知添加到通知列表，不会亮屏提醒。"""
             "badge": 1,
-            "icon": "https://ys.mihoyo.com/main/favicon.ico",
             "group": "BHYG",
             "isArchive": 1,
         }
+        if isPlus:
+            data["level"] = "critical"
+            data["sound"] = "minuet"
+            data["volume"] = 10
         self.net.Response(method="post", url=url, params=data)
 
     @logger.catch

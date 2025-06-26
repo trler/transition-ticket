@@ -708,7 +708,7 @@ class Task:
         t4 = threading.Thread(target=notice.Ding, args=(self.notice["dingding"],))
         t5 = threading.Thread(target=notice.WX, args=(self.notice["wx"],))
         t6 = threading.Thread(target=notice.FTQQ, args=(self.notice["ftqq"],))
-        t7 = threading.Thread(target=notice.Bark, args=(self.notice["bark"],))
+        t7 = threading.Thread(target=notice.Bark, args=(self.notice["bark"],self.notice["bark_plus"]))
         t8 = threading.Thread(target=notice.Mail, args=(self.notice["smtp"],))
 
         if self.notice["system"]:
