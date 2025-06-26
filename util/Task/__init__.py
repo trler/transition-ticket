@@ -365,6 +365,8 @@ class Task:
 
         if countdown <= 0:
             logger.info("【等待开票】已开票! 开始进入抢票模式")
+            # sleep 0.5 秒以避免时间误差
+            sleep(0.5)
             self.countdownCode = 0
 
     @logger.catch
@@ -559,7 +561,7 @@ class Task:
 
             # 库存不足 219,221
             case 219 | 221:
-                logger.warning(f"【创建订单】库存暂时不足! ({self.createOrderCode})")
+                logger.warning(f"【创建订单】库存暂时不足! 触发订单创建盾! ({self.createOrderCode})")
                 # 刷新
                 self.AutoSleepInterval(option=3)
 
@@ -635,7 +637,7 @@ class Task:
                 sys.exit()
 
             case 429:
-                logger.warning("【创建订单】b站限速, 延迟50ms请求 (429)")
+                logger.warning("【创建订单】CDN 限速, 延迟50ms请求 (429)")
                 sleep(0.05)
 
             case 900001:
@@ -645,7 +647,7 @@ class Task:
             # 失败
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】b站限速, 延迟50ms请求 (429)")
+                    logger.warning("【创建订单】CDN 限速, 延迟50ms请求 (429)")
                     self.createOrderCode = 429
                     sleep(0.05)
 
