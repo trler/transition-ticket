@@ -148,7 +148,9 @@ class Notice:
         data = {
             "title": self.title,
             "body": self.message,
-            "level": "timeSensitive",
+            "level": "critical",
+            "volume": 10,
+            "sound": "minuet",
             # 推送中断级别。
             # active：默认值，系统会立即亮屏显示通知
             # timeSensitive：时效性通知，可在专注状态下显示通知。
