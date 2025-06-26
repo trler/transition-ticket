@@ -703,7 +703,6 @@ class Task:
         # 通知
         noticeThread = []
         t1 = threading.Thread(target=notice.Message)
-        t2 = threading.Thread(target=notice.Sound)
         t3 = threading.Thread(target=notice.PushPlus, args=(self.notice["pushplus"],))
         t4 = threading.Thread(target=notice.Ding, args=(self.notice["dingding"],))
         t5 = threading.Thread(target=notice.WX, args=(self.notice["wx"],))
@@ -713,8 +712,6 @@ class Task:
 
         if self.notice["system"]:
             noticeThread.append(t1)
-        if self.notice["sound"]:
-            noticeThread.append(t2)
 
         if len(self.notice["pushplus"]) > 0:
             noticeThread.append(t3)

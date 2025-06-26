@@ -29,7 +29,6 @@ class Notice:
 
         self.appName = "Transition-Ticket"
         self.appIconPath = self.AssetsDir("assets/icon.ico")
-        self.audioPath = self.AssetsDir("assets/alarm.wav")
 
         self.title = title
         self.message = message
@@ -59,29 +58,6 @@ class Notice:
             app_name=self.appName,
             timeout=timeout,
         )
-
-    @logger.catch
-    def Sound(self, time: int = 3) -> None:
-        """
-        声音
-        """
-        import pyaudio
-
-        p = pyaudio.PyAudio()
-        stream = p.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=44100,
-            output=True,
-        )
-
-        with open(self.audioPath, "rb") as audio_file:
-            audio_data = audio_file.read()
-            for _ in range(time):
-                stream.write(audio_data)
-
-        stream.stop_stream()
-        stream.close()
 
     @logger.catch
     def PushPlus(self, token: str) -> None:

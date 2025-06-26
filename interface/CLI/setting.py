@@ -12,7 +12,7 @@ class SettingCli:
     """
 
     # 提醒模式
-    noticeMode = ["系统提醒", "音频提醒", "微信提醒(Push Plus)"]
+    noticeMode = ["系统提醒", "微信提醒(Push Plus)"]
 
     @logger.catch
     def __init__(self, conf: Config):
@@ -42,8 +42,6 @@ class SettingCli:
             "notice": {
                 # 系统提醒
                 "system": False,
-                # 音频提醒
-                "sound": False,
                 # pushplus提醒
                 "pushplus": "",
                 # 钉钉
@@ -134,8 +132,6 @@ class SettingCli:
             dist = {
                 # 系统提醒
                 "system": False,
-                # 音频提醒
-                "sound": False,
                 # pushplus提醒
                 "pushplus": "",
                 # 钉钉
@@ -161,7 +157,6 @@ class SettingCli:
                 message="抢票成功通知方式, 按空格勾选",
                 choices=[
                     ("系统提醒", "system"),
-                    ("音频提醒", "sound"),
                     ("PushPlus提醒", "pushplus"),
                     ("bark推送", "bark"),
                     ("钉钉推送", "dingding"),
@@ -169,7 +164,7 @@ class SettingCli:
                     ("smtp邮件推送", "smtp"),
                     ("方糖推送", "ftqq"),
                 ],
-                default=["系统提醒", "音频提醒"],
+                default=["系统提醒"],
             )
             for i in select:
                 if i == "smtp":
