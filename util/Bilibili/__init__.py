@@ -482,13 +482,13 @@ class Bilibili:
 
         scrollX = 0
         scrollY = 0
-        innerWidth = 1800
-        innerHeight = 1038
-        outerWidth = 1800
-        outerHeight = 1125
+        innerWidth = 1170
+        innerHeight = 2532
+        outerWidth = 1170
+        outerHeight = 2532
         screenX = 0
         screenY = 44
-        screenWidth = 1800
+        screenWidth = 1170
 
         data = bytearray(16)
         data[0] = 0
