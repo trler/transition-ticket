@@ -574,6 +574,7 @@ class Task:
             # 请慢一点
             case 100001:
                 logger.error("【创建订单】登录态不完整 (100001)")
+                self.AutoSleepInterval()
 
             case 3:
                 logger.error("【创建订单】身份证盾中，请稍后重试 (3)")
@@ -637,19 +638,19 @@ class Task:
                 sys.exit()
 
             case 429:
-                logger.warning("【创建订单】CDN 限速, 延迟50ms请求 (429)")
-                sleep(0.05)
+                logger.warning("【创建订单】CDN 限速, 延迟 100ms (429)")
+                sleep(0.1)
 
             case 900001:
-                logger.warning("【创建订单】订单校验盾 (900001)")
+                logger.warning("【创建订单】订单校验盾, 延迟 1s (900001)")
                 self.AutoSleepInterval(option=1)
 
             # 失败
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】CDN 限速, 延迟50ms请求 (429)")
+                    logger.warning("【创建订单】CDN 限速, 延迟 100ms  (429)")
                     self.createOrderCode = 429
-                    sleep(0.05)
+                    sleep(0.1)
 
                 else:
                     logger.error(f"【创建订单】未知错误码 {self.createOrderCode}: {msg}")
@@ -736,22 +737,19 @@ class Task:
         """
         自动Sleep策略
         """
-        # 票仓有票
-        if self.data.TimestampCheck(timestamp=self.availableTime):
-            match option:
-                # 1s 盾
-                case 1:
-                    sleep(0.95)
-                # 3s 盾
-                case 3:
-                    sleep(2.95)
-                # 5s 盾
-                case 5:
-                    sleep(4.96)
-
-        # 票仓无票
-        else:
-            sleep(self.sleep)
+        match option:
+            # 1s 盾
+            case 1:
+                sleep(0.95)
+            # 3s 盾
+            case 3:
+                sleep(2.95)
+            # 5s 盾
+            case 5:
+                sleep(4.96)
+            # 其他情况
+            case _:
+                sleep(self.sleep)
 
     @logger.catch
     def DrawFSM(self) -> None:

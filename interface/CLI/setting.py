@@ -109,7 +109,7 @@ class SettingCli:
             interval = self.data.Inquire(
                 type="Text",
                 message="请输入常规请求间隔时间(单位:秒), 太快有概率会被风控!",
-                default="0.6",
+                default="0.4",
             )
             return float(interval)
 
