@@ -733,7 +733,7 @@ class Task:
             t.start()
 
     @logger.catch
-    def AutoSleepInterval(self, option=1) -> None:
+    def AutoSleepInterval(self, option=None) -> None:
         """
         自动Sleep策略
         """
