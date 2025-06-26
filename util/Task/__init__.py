@@ -693,7 +693,7 @@ class Task:
         """
         url = f"https://show.bilibili.com/platform/orderDetail.html?order_id={self.api.orderId}"
         notice = Notice(
-            title="抢票",
+            title=f"抢票 {self.notice['alter_name']}",
             message=f"下单成功! 请在十分钟内支付, 链接:{url}",
         )
         logger.success(f"【完成】下单成功! 请在十分钟内支付, 链接:{url}")

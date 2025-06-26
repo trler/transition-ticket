@@ -130,6 +130,8 @@ class SettingCli:
             提醒
             """
             dist = {
+                # 用于提醒显示的别名
+                "alter_name": "",
                 # 系统提醒
                 "system": False,
                 # pushplus提醒
@@ -252,6 +254,13 @@ class SettingCli:
                 dist["smtp"]["mail_pass"] = passwd
                 dist["smtp"]["sender"] = smtp_sender
                 dist["smtp"]["receiver"] = list(smtp_receivers.split(","))
+
+            token = self.data.Inquire(
+                type="Text",
+                message="请输入账号别名",
+                default="",
+            )
+            dist["alter_name"] = token
 
             return dist
 
