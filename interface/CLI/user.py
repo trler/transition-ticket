@@ -15,7 +15,7 @@ class UserCli:
     """
 
     @logger.catch
-    def __init__(self, conf: Config, isEncrypt: bool = True):
+    def __init__(self, conf: Config, isEncrypt: bool = False):
         """
         初始化
 
