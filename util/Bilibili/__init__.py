@@ -260,7 +260,9 @@ class Bilibili:
             "voucher": self.voucher,
             "projectId": self.projectId,
             "project_id": self.projectId,
-            "requestSource": self.scene
+            "requestSource": self.scene,
+            "timestamp": int(time()),
+            "show_cashier": 1,
         }
         if self.isHot:
             params["ptoken"] = self.ptoken
