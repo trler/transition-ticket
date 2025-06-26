@@ -201,6 +201,8 @@ class Bilibili:
         获取Token
         """
         # 成功
+        self.prepareTime = int(time() * 1000)
+
         if not self.risked:
             url = f"https://show.bilibili.com/api/ticket/order/prepare?project_id={self.projectId}"
 
@@ -219,6 +221,10 @@ class Bilibili:
             "requestSource": self.scene,
             "newRisk": True,
         }
+
+        if self.isHot:
+            params["token"] = self.EncodeCtoken()
+
         res = self.net.Response(method="post", url=url, params=params)
         code = res["errno"]
         msg = res["msg"]
@@ -226,7 +232,6 @@ class Bilibili:
         match code:
             # 成功
             case 0:
-                self.prepareTime = int(time() * 1000)
                 self.token = res["data"]["token"]
                 if self.isHot:
                     self.ptoken = res["data"]["ptoken"]
