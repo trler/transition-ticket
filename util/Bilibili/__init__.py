@@ -482,16 +482,16 @@ class Bilibili:
 
         scrollX = 0
         scrollY = 0
-        innerWidth = 1170
-        innerHeight = 2532
-        outerWidth = 1170
-        outerHeight = 2532
+        innerWidth = 375
+        innerHeight = 667
+        outerWidth = 375
+        outerHeight = 667
         screenX = 0
-        screenY = 44
-        screenWidth = 1170
+        screenY = 0
+        screenWidth = 375
 
         data = bytearray(16)
-        data[0] = 0
+        data[0] = 3
         data[1] = min(scrollX, 255)
         data[2] = 0
         data[3] = min(scrollY, 255)
