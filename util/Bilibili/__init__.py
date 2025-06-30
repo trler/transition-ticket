@@ -351,7 +351,7 @@ class Bilibili:
         """
         创建订单
         """
-        url = "https://show.bilibili.com/api/ticket/order/createV2"
+        url = "https://show.bilibili.com/api/ticket/order/createV2?project_id={self.projectId}"
         timestamp = int(round(time() * 1000))
         clickPosition = {
             # "x": randint(1300, 1500),
@@ -384,6 +384,7 @@ class Bilibili:
             "newRisk": True,
         }
         if self.isHot:
+            url += f"&ptoken={self.ptoken}"
             params["ptoken"] = self.ptoken
             params["ctoken"] = self.ctoken_generator.generate_ctoken()
 
