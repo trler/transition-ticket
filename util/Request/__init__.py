@@ -94,6 +94,14 @@ class Request:
         if method not in methods:
             logger.warning("? 这是什么方式")
 
+        if 'ptoken' in params:
+            query_params = [f"ptoken={params['ptoken']}"]
+            if 'project_id' in params:
+                query_params.append(f"project_id={params['project_id']}")
+            separator = '&' if '?' in url else '?'
+            url = f"{url}{separator}{'&'.join(query_params)}"
+
+
         try:
             if isJson:
                 # self.session.headers.update({"Content-Type": "application/json"})

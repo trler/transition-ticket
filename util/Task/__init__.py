@@ -637,8 +637,8 @@ class Task:
                 sys.exit()
 
             case 429:
-                logger.warning("【创建订单】CDN 限速, 延迟 100ms (429)")
-                sleep(0.1)
+                logger.warning("【创建订单】CDN 限速 (429)")
+                self.AutoSleepInterval()
 
             case 900001:
                 logger.warning("【创建订单】订单校验盾, 延迟 1s (900001)")
@@ -647,9 +647,9 @@ class Task:
             # 失败
             case _:
                 if msg == "请求错误: 429":
-                    logger.warning("【创建订单】CDN 限速, 延迟 100ms  (429)")
+                    logger.warning("【创建订单】CDN 限速 (429)")
                     self.createOrderCode = 429
-                    sleep(0.1)
+                    self.AutoSleepInterval()
 
                 else:
                     logger.error(f"【创建订单】未知错误码 {self.createOrderCode}: {msg}")
