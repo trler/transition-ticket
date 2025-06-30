@@ -8,6 +8,7 @@ from loguru import logger
 
 from util.Info import Info
 from util.Request import Request
+from util.CToken import CTokenGenerator
 
 
 class Bilibili:
@@ -99,6 +100,11 @@ class Bilibili:
         self.risked = False
         self.prepareTime = 0
         self.ctoken = ""
+        self.ctoken_generator = CTokenGenerator(
+            self.saleStart,
+            time_offset=0,
+            stay_time=randint(2000, 10000)
+        )
 
         # Risk Param
         self.buvid = ""
@@ -223,7 +229,7 @@ class Bilibili:
         }
 
         if self.isHot:
-            params["token"] = self.EncodeCtoken()
+            params["token"] = self.ctoken_generator.generate_ctoken(type="prepare")
 
         res = self.net.Response(method="post", url=url, params=params)
         code = res["errno"]
@@ -379,7 +385,7 @@ class Bilibili:
         }
         if self.isHot:
             params["ptoken"] = self.ptoken
-            params["ctoken"] = self.EncodeCtoken()
+            params["ctoken"] = self.ctoken_generator.generate_ctoken()
 
         # 优惠票
         if self.act:
@@ -482,16 +488,16 @@ class Bilibili:
 
         scrollX = 0
         scrollY = 0
-        innerWidth = 375
-        innerHeight = 667
-        outerWidth = 375
-        outerHeight = 667
+        innerWidth = 1170
+        innerHeight = 2532
+        outerWidth = 1170
+        outerHeight = 2532
         screenX = 0
-        screenY = 0
-        screenWidth = 375
+        screenY = 44
+        screenWidth = 1170
 
         data = bytearray(16)
-        data[0] = 3
+        data[0] = 0
         data[1] = min(scrollX, 255)
         data[2] = 0
         data[3] = min(scrollY, 255)

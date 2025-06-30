@@ -7,6 +7,7 @@ from util.Login import Login
 from util.Notice import Notice
 from util.Request import Request
 from util.Task import Task
+from util.CToken import CTokenGenerator
 
 __all__ = [
     "Bilibili",
@@ -18,4 +19,5 @@ __all__ = [
     "Notice",
     "Request",
     "Task",
+    "CTokenGenerator"
 ]
