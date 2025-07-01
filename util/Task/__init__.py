@@ -506,6 +506,11 @@ class Task:
         """
         等待余票
         """
+        logger.info("【等待余票】跳过等待余票")
+        self.availableTime = int(time())
+        self.queryTicketCode = True
+        return
+
         code, msg, clickable, salenum, num = self.api.QueryAmount()
         self.queryTicketCode = clickable or salenum != 4 or num > 0
 
