@@ -91,18 +91,21 @@ class ProductCli:
             活动
             """
             # print(f"{self.BLUE}[{self.YELLOW}!{self.BLUE}]{self.RESET} 近期活动: show.bilibili.com/platform/detail.html?id=114514")
-            url = self.data.Inquire(
+            url_or_id = self.data.Inquire(
                 type="Text",
-                message="请粘贴要抢的活动的网页链接",
+                message="请粘贴要抢的活动的网页链接或活动ID",
             )
 
             try:
-                if urlparse(url).netloc == "b23.tv":
-                    parsed = parse_qs(urlparse(self.info.QueryRedirect(url)).query)
+                if url_or_id.strip().isdigit():
+                    projectId = int(url_or_id.strip())
+                    return projectId
+                if urlparse(url_or_id).netloc == "b23.tv":
+                    parsed = parse_qs(urlparse(self.info.QueryRedirect(url_or_id)).query)
                     projectId = parsed.get("id", [0])[0]
                     return projectId
                 else:
-                    match = re.search(r"id=(\d+)", url)
+                    match = re.search(r"id=(\d+)", url_or_id)
                     if match:
                         projectId = int(match.group(1))
                         return projectId
