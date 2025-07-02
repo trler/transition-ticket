@@ -577,7 +577,7 @@ class Task:
 
             # 请慢一点
             case 100001:
-                logger.error("【创建订单】登录态不完整 (100001)")
+                logger.error("【创建订单】前方拥堵，请重试 (100001)")
                 self.AutoSleepInterval()
 
             case 3:
